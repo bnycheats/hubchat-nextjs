@@ -22,6 +22,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { Fragment } from "react";
+import Link from "next/link";
 
 const FormSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -113,9 +114,11 @@ export default function LoginPage() {
                 </FormItem>
               )}
             />
-            <Button type="button" className="h-auto p-0" variant="link">
-              Forgot Password?
-            </Button>
+            <Link href="/forgot-password">
+              <Button type="button" className="h-auto p-0" variant="link">
+                Forgot Password?
+              </Button>
+            </Link>
           </div>
           <Button className="w-full" disabled={loginMutation.isPending}>
             {loginMutation.isPending && (
