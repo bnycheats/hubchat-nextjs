@@ -35,7 +35,6 @@ export default function PrivateLayout({ children }: { children: ReactNode }) {
         <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
         <main>
           <div className="mx-auto max-w-[968px] px-4 py-4 xl:px-0">
-            <h2 className="mb-6 text-3xl font-semibold">{document.title}</h2>
             {children}
           </div>
         </main>

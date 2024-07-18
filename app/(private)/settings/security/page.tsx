@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import ChangePasswordModal from "./components/change-password-modal";
+import ChangePasswordModal from "./change-password-modal";
 
 export default function SecurityPage() {
   const [changePassOpen, setChangePassOpen] = useState(false);

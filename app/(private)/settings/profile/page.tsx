@@ -8,11 +8,11 @@ import { AiOutlineRight } from "react-icons/ai";
 import Avatar from "@/components/header/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import UpdateAddressModal from "./components/update-address-modal";
-import UpdateDateOfBirthModal from "./components/update-date-of-birth-modal";
-import UpdateDisplayNameModal from "./components/update-display-name-modal";
-import UpdateFullNameModal from "./components/update-full-name-modal";
-import UpdatePhoneNumberModal from "./components/update-phone-number-modal";
+import UpdateAddressModal from "./update-address-modal";
+import UpdateDateOfBirthModal from "./update-date-of-birth-modal";
+import UpdateDisplayNameModal from "./update-display-name-modal";
+import UpdateFullNameModal from "./update-full-name-modal";
+import UpdatePhoneNumberModal from "./update-phone-number-modal";
 
 export default function ProfilePage() {
   const { authUser, userDetails } = useAuth();
