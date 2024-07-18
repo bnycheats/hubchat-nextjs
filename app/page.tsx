@@ -1,11 +1,17 @@
-import LoginPage from "./auth/login/page";
+"use client";
+
+import useAuth from "@/hooks/useAuth";
+import { redirect } from "next/navigation";
+
+import Spinner from "@/components/spinner";
 
 export default function Home() {
-  return (
-    <main>
-      <div>
-        <LoginPage />
-      </div>
-    </main>
-  );
+  const { loading, authUser } = useAuth();
+  if (loading) return <Spinner centered fullScreen />;
+
+  if (authUser) {
+    redirect("/dashboard");
+  } else {
+    redirect("/login");
+  }
 }

@@ -4,9 +4,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
+import { login } from "@/firebase/client/mutations/auth";
+import { type LoginPayloadType } from "@/firebase/client/mutations/auth/types";
 
 import Password from "@/components/password";
 import Spinner from "@/components/spinner";
+import { handleLoginError } from "@/errors/login-error";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -18,7 +21,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
-import AuthLayout from "../auth-layout";
+import { Fragment } from "react";
 
 const FormSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -40,26 +43,23 @@ export default function LoginPage() {
     },
   });
 
-  //   const loginMutation = useMutation({
-  //     mutationFn: (request: LoginPayloadType) => login(request),
-  //     onError: (error: any) =>
-  //       toast({
-  //         variant: "destructive",
-  //         title: handleLoginError(error.code),
-  //       }),
-  //   });
+  const loginMutation = useMutation({
+    mutationFn: (request: LoginPayloadType) => login(request),
+    onError: (error: any) =>
+      toast({
+        variant: "destructive",
+        title: handleLoginError(error.code),
+      }),
+  });
 
-  //   const onSubmit: SubmitHandler<LoginPayloadType> = (data) =>
-  //     loginMutation.mutate(data);
+  const onSubmit: SubmitHandler<LoginPayloadType> = (data) =>
+    loginMutation.mutate(data);
 
   return (
-    <AuthLayout>
+    <Fragment>
       <h1 className="mb-3 text-lg font-medium">Login</h1>
       <Form {...form}>
-        <form
-          //  onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-6"
-        >
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <FormField
             control={form.control}
             name="email"
@@ -70,7 +70,7 @@ export default function LoginPage() {
                   {...field}
                   type="email"
                   placeholder="Email Address*"
-                  //   disabled={loginMutation.isPending}
+                  disabled={loginMutation.isPending}
                 />
                 <FormMessage />
               </FormItem>
@@ -85,7 +85,7 @@ export default function LoginPage() {
                 <Password
                   {...field}
                   placeholder="Password*"
-                  //   disabled={loginMutation.isPending}
+                  disabled={loginMutation.isPending}
                 />
                 <FormMessage />
               </FormItem>
@@ -113,27 +113,18 @@ export default function LoginPage() {
                 </FormItem>
               )}
             />
-            {/* <Link to={paths.public.FORGOT_PASSWORD}>
-                            <Button
-                                type="button"
-                                className="h-auto p-0"
-                                variant="link"
-                            >
-                                Forgot Password?
-                            </Button>
-                        </Link> */}
+            <Button type="button" className="h-auto p-0" variant="link">
+              Forgot Password?
+            </Button>
           </div>
-          <Button
-            className="w-full"
-            //   disabled={loginMutation.isPending}
-          >
-            {/* {loginMutation.isPending && (
+          <Button className="w-full" disabled={loginMutation.isPending}>
+            {loginMutation.isPending && (
               <Spinner className="h-5 w-5 text-white" />
-            )} */}
+            )}
             Login
           </Button>
         </form>
       </Form>
-    </AuthLayout>
+    </Fragment>
   );
 }
