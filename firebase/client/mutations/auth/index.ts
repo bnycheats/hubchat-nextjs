@@ -48,27 +48,21 @@ export function updateUserProfile({
 }
 
 export async function createUser({ email, payload }: CreateUserPayloadType) {
-  try {
-    const res = await fetch("/api/auth/createUser", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email,
-        password: generatePass(),
-        displayName: `${payload.first_name} ${payload.last_name}`,
-        ...payload,
-      }),
-    });
-
-    if (!res.ok) {
-      throw new Error("Failed to fetch data");
-    }
-
-    return res.json();
-  } catch (err) {
-    console.log(err);
-    throw err;
+  const response = await fetch("/api/auth/createUser", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      email,
+      password: generatePass(),
+      displayName: `${payload.first_name} ${payload.last_name}`,
+      ...payload,
+    }),
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.error);
   }
+  return data;
 }

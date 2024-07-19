@@ -3,12 +3,12 @@
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import ChangePasswordModal from "./change-password-modal";
+import ChangePasswordModal from "./_components/change-password-modal";
 
 export default function SecurityPage() {
   const [changePassOpen, setChangePassOpen] = useState(false);
   return (
-    <div>
+    <section>
       <ChangePasswordModal
         open={changePassOpen}
         closeModal={() => setChangePassOpen(false)}
@@ -30,6 +30,6 @@ export default function SecurityPage() {
           </Button>
         </li>
       </ul>
-    </div>
+    </section>
   );
 }

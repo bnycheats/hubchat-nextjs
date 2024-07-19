@@ -1,10 +1,12 @@
 "use client";
 
 import { Inter } from "next/font/google";
-import "./globals.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "@/context/authContext";
 import { Toaster } from "@/components/ui/toaster";
+
+import "./globals.css";
+import "react-day-picker/dist/style.css";
 
 const inter = Inter({ subsets: ["latin"] });
 

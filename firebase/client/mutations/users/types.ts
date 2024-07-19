@@ -4,3 +4,7 @@ export type UpdateUserPayloadType = {
   userId: string;
   payload: Partial<UserDetailsType>;
 };
+
+export type GetUserPayloadType = {
+  userId: string;
+};

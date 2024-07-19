@@ -25,7 +25,7 @@ export default function PrivateLayout({ children }: { children: ReactNode }) {
   if (!authUser) redirect("/login");
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <section className="flex h-screen overflow-hidden">
       <Sidebar
         model={menuItems}
         sidebarOpen={sidebarOpen}
@@ -39,7 +39,7 @@ export default function PrivateLayout({ children }: { children: ReactNode }) {
           </div>
         </main>
       </div>
-    </div>
+    </section>
   );
 }
 

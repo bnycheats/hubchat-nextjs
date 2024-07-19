@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
       postal_code,
       role,
     });
-    return new NextResponse(null, { status: 200 });
+    return NextResponse.json({ uid: user.uid }, { status: 201 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

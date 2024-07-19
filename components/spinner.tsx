@@ -5,7 +5,7 @@ const Spinner = (props: SpinnerProps) => {
   return (
     <div
       className={cn({
-        "z-999999 absolute bottom-0 left-0 right-0 top-0 flex h-full w-full items-center justify-center bg-transparent":
+        "z-[99999] fixed inset-0 flex h-full w-full items-center justify-center bg-white/30 backdrop-blur-sm":
           centered,
         "h-screen": fullScreen,
       })}

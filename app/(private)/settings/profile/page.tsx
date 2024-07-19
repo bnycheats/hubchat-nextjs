@@ -8,11 +8,11 @@ import { AiOutlineRight } from "react-icons/ai";
 import Avatar from "@/components/header/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import UpdateAddressModal from "./update-address-modal";
-import UpdateDateOfBirthModal from "./update-date-of-birth-modal";
-import UpdateDisplayNameModal from "./update-display-name-modal";
-import UpdateFullNameModal from "./update-full-name-modal";
-import UpdatePhoneNumberModal from "./update-phone-number-modal";
+import UpdateAddressModal from "./_components/update-address-modal";
+import UpdateDateOfBirthModal from "./_components/update-date-of-birth-modal";
+import UpdateDisplayNameModal from "./_components/update-display-name-modal";
+import UpdateFullNameModal from "./_components/update-full-name-modal";
+import UpdatePhoneNumberModal from "./_components/update-phone-number-modal";
 
 export default function ProfilePage() {
   const { authUser, userDetails } = useAuth();
@@ -22,7 +22,7 @@ export default function ProfilePage() {
   const [updatePhoneNumber, setUpdatePhoneNumber] = useState(false);
   const [updateAddress, setUpdateAddress] = useState(false);
   return (
-    <div>
+    <section>
       <UpdateDisplayNameModal
         open={updateDisplayName}
         closeModal={() => setUpdateDisplayName(false)}
@@ -125,7 +125,7 @@ export default function ProfilePage() {
             <div className="grid grid-cols-3 border-t border-slate-100 py-6">
               <div>Phone number</div>
               <div className="flex flex-col items-start gap-2">
-                {userDetails.phone_number}
+                {userDetails?.phone_number}
                 <Button
                   onClick={() => setUpdatePhoneNumber(true)}
                   variant="link"
@@ -139,9 +139,11 @@ export default function ProfilePage() {
             <div className="grid grid-cols-3 border-t border-slate-100 py-6">
               <div>Address</div>
               <div className="flex flex-col items-start gap-2">
-                <div>{userDetails.postal_code}</div>
-                <div>{userDetails.street}</div>
-                <div>{userDetails.province}</div>
+                {userDetails?.postal_code && (
+                  <div>{userDetails.postal_code}</div>
+                )}
+                {userDetails?.street && <div>{userDetails.street}</div>}
+                {userDetails?.province && <div>{userDetails.province}</div>}
                 <Button
                   onClick={() => setUpdateAddress(true)}
                   variant="link"
@@ -155,6 +157,6 @@ export default function ProfilePage() {
           </Fragment>
         )}
       </div>
-    </div>
+    </section>
   );
 }

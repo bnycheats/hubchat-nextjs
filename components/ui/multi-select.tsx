@@ -27,6 +27,7 @@ function MultiSelect({
   options,
   selected,
   onChange,
+  displayLabel,
   onValueChange,
   className,
   placeholder = "Select...",
@@ -61,7 +62,9 @@ function MultiSelect({
               ))}
             {selected.map((item) => (
               <Badge key={item} className="flex gap-1.5">
-                {item}
+                {displayLabel
+                  ? options?.find((option) => option.value === item)?.label
+                  : item}
                 <X
                   className="h-4 w-4 hover:text-destructive"
                   onClick={() => handleUnselect(item)}
@@ -112,6 +115,7 @@ function MultiSelect({
 export interface MultiSelectProps {
   options: OptionType[];
   selected: string[];
+  displayLabel?: boolean;
   onChange?: React.Dispatch<React.SetStateAction<string[]>>;
   onValueChange?: (value: Array<string>) => void;
   className?: string;
