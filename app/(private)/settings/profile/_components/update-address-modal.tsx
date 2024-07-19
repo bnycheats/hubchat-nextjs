@@ -62,7 +62,7 @@ function UpdateAddressModal(props: UpdateAddressModalProps) {
     defaultValues,
   });
 
-  const updateAddressModalMutation = useMutation({
+  const updateAddressMutation = useMutation({
     mutationFn: (request: UpdateUserPayloadType) => updateUser(request),
     onSuccess: () => {
       toast({
@@ -86,7 +86,7 @@ function UpdateAddressModal(props: UpdateAddressModalProps) {
 
   const onPressSubmit: SubmitHandler<FormValues> = (payload) =>
     authUser &&
-    updateAddressModalMutation.mutate({
+    updateAddressMutation.mutate({
       userId: authUser.uid,
       payload,
     });
@@ -119,7 +119,7 @@ function UpdateAddressModal(props: UpdateAddressModalProps) {
                   <Input
                     {...field}
                     placeholder="Postal code*"
-                    disabled={updateAddressModalMutation.isPending}
+                    disabled={updateAddressMutation.isPending}
                   />
                   <FormMessage />
                 </FormItem>
@@ -134,7 +134,7 @@ function UpdateAddressModal(props: UpdateAddressModalProps) {
                   <Textarea
                     {...field}
                     placeholder="Street*"
-                    disabled={updateAddressModalMutation.isPending}
+                    disabled={updateAddressMutation.isPending}
                   />
                   <FormMessage />
                 </FormItem>
@@ -181,11 +181,10 @@ function UpdateAddressModal(props: UpdateAddressModalProps) {
                 className="rounded-full"
                 type="submit"
                 disabled={
-                  updateAddressModalMutation.isPending ||
-                  !form.formState.isDirty
+                  updateAddressMutation.isPending || !form.formState.isDirty
                 }
               >
-                {updateAddressModalMutation.isPending && (
+                {updateAddressMutation.isPending && (
                   <Spinner className="h-5 w-5 text-white" />
                 )}
                 Update

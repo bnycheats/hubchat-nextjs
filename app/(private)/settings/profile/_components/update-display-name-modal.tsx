@@ -1,8 +1,8 @@
 "use client";
 
 import { handleUpdateProfileError } from "@/errors/update-profile-error";
-import { updateUserProfile } from "@/firebase/client/mutations/auth";
-import { type UpdateUserProfilePayloadType } from "@/firebase/client/mutations/auth/types";
+import { updateUserDisplayName } from "@/firebase/client/mutations/auth";
+import { type UpdateDisplayNamePayloadType } from "@/firebase/client/mutations/auth/types";
 import useAuth from "@/hooks/useAuth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type DialogProps } from "@radix-ui/react-dialog";
@@ -49,8 +49,8 @@ function UpdateDisplayNameModal(props: UpdateDisplayNameModalProps) {
   });
 
   const updateUserProfileMutation = useMutation({
-    mutationFn: (request: UpdateUserProfilePayloadType) =>
-      updateUserProfile(request),
+    mutationFn: (request: UpdateDisplayNamePayloadType) =>
+      updateUserDisplayName(request),
     onSuccess: () => {
       toast({
         variant: "success",

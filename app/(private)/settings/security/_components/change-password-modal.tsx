@@ -73,13 +73,11 @@ function ChangePasswordModal(props: ChangePasswordModalProps) {
       form.reset();
       closeModal();
     },
-    onError: (error: any) => {
-      console.log(error);
+    onError: (error: any) =>
       toast({
         variant: "destructive",
         title: handleChangePasswordError(error.code),
-      });
-    },
+      }),
   });
 
   const onPressSubmit: SubmitHandler<FormValues> = (data) =>

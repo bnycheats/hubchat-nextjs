@@ -50,7 +50,7 @@ function UpdateFullNameModal(props: UpdateFullNameModalProps) {
     defaultValues,
   });
 
-  const updateFullNameModalMutation = useMutation({
+  const updateFullNameMutation = useMutation({
     mutationFn: (request: UpdateUserPayloadType) => updateUser(request),
     onSuccess: () => {
       toast({
@@ -74,7 +74,7 @@ function UpdateFullNameModal(props: UpdateFullNameModalProps) {
 
   const onPressSubmit: SubmitHandler<FormValues> = (payload) =>
     authUser &&
-    updateFullNameModalMutation.mutate({
+    updateFullNameMutation.mutate({
       userId: authUser.uid,
       payload,
     });
@@ -107,7 +107,7 @@ function UpdateFullNameModal(props: UpdateFullNameModalProps) {
                   <Input
                     {...field}
                     placeholder="First name*"
-                    disabled={updateFullNameModalMutation.isPending}
+                    disabled={updateFullNameMutation.isPending}
                   />
                   <FormMessage />
                 </FormItem>
@@ -122,7 +122,7 @@ function UpdateFullNameModal(props: UpdateFullNameModalProps) {
                   <Input
                     {...field}
                     placeholder="Last name*"
-                    disabled={updateFullNameModalMutation.isPending}
+                    disabled={updateFullNameMutation.isPending}
                   />
                   <FormMessage />
                 </FormItem>
@@ -142,11 +142,10 @@ function UpdateFullNameModal(props: UpdateFullNameModalProps) {
                 className="rounded-full"
                 type="submit"
                 disabled={
-                  updateFullNameModalMutation.isPending ||
-                  !form.formState.isDirty
+                  updateFullNameMutation.isPending || !form.formState.isDirty
                 }
               >
-                {updateFullNameModalMutation.isPending && (
+                {updateFullNameMutation.isPending && (
                   <Spinner className="h-5 w-5 text-white" />
                 )}
                 Update

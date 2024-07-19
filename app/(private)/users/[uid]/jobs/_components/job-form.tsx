@@ -1,21 +1,20 @@
 "use client";
 
 import provinces from "@/constants/provinces";
-import { createUser } from "@/firebase/client/mutations/auth";
-import { type CreateUserPayloadType } from "@/firebase/client/mutations/auth/types";
-
+import { updateUser } from "@/firebase/client/mutations/users";
+import { getUser } from "@/firebase/client/queries/users";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
-import roles from "@/constants/roles";
 import { CalendarIcon } from "lucide-react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { z } from "zod";
+import roles from "@/constants/roles";
 
 import { cn } from "@/lib/utils";
-import Spinner from "@/components/spinner";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
+import { useEffect } from "react";
 import {
   Form,
   FormControl,
@@ -38,11 +37,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useParams } from "next/navigation";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { RolesEnums } from "@/helpers/types";
-import { useRouter } from "next/navigation";
+import TooltipInfo from "@/components/tooltip-info";
+import { type UpdateUserPayloadType } from "@/firebase/client/mutations/users/types";
+import Spinner from "@/components/spinner";
 import { type GetCompaniesResponse } from "@/firebase/client/queries/companies/types";
+import { type GetUserDetailsResponseType } from "@/firebase/client/queries/users/types";
 
 const FormSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -61,13 +64,20 @@ const FormSchema = z.object({
   postal_code: z.string().min(1, { message: "This field is required" }),
 });
 
-export default function CreateUserForm(props: CreateUserFormProps) {
-  const { companies } = props;
+export default function JobForm(props: JobFormProps) {
+  const { user: userInitialData, companies } = props;
+
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const router = useRouter();
+  const { uid } = useParams<{ uid: string }>();
 
-  const defaultValues: FormValues = {
+  const { data: userDetails, isLoading } = useQuery({
+    queryKey: ["User", uid],
+    queryFn: async () => getUser({ userId: uid }),
+    initialData: userInitialData,
+  });
+
+  const defaultValues: UpdateUserDetailsFormValues = {
     email: "",
     first_name: "",
     last_name: "",
@@ -80,35 +90,38 @@ export default function CreateUserForm(props: CreateUserFormProps) {
     companies: [],
   };
 
-  const form = useForm<FormValues>({
+  const form = useForm<UpdateUserDetailsFormValues>({
     resolver: zodResolver(FormSchema),
     defaultValues,
   });
 
-  const createUserMutation = useMutation({
-    mutationFn: (request: CreateUserPayloadType) => createUser(request),
-    onSuccess: (data) => {
-      router.push(`/users/${data?.uid}/jobs`);
+  const updateUserMutation = useMutation({
+    mutationFn: (request: UpdateUserPayloadType) => updateUser(request),
+    onSuccess: () => {
       toast({
         variant: "success",
-        title: "User created successfully",
+        title: "User details updated successfully",
       });
-      form.reset({});
-      queryClient.invalidateQueries({ queryKey: ["Users"] });
+      form.reset(form.watch(), {
+        keepValues: false,
+        keepDirty: false,
+        keepDefaultValues: false,
+      });
+      queryClient.invalidateQueries({ queryKey: ["User"] });
     },
-    onError: (error: any) => {
-      console.log(error);
+    onError: (error: any) =>
       toast({
         variant: "destructive",
-        title: error?.toString(),
-      });
-    },
+        title: `Error updating user details: ${error}`,
+      }),
   });
 
-  const onPressSubmit: SubmitHandler<FormValues> = (payload) => {
-    const { email, dob, role, ...other } = payload;
-    createUserMutation.mutate({
-      email,
+  const onPressSubmit: SubmitHandler<UpdateUserDetailsFormValues> = (
+    payload
+  ) => {
+    const { dob, role, ...other } = payload;
+    updateUserMutation.mutate({
+      userId: uid,
       payload: {
         ...other,
         role: role as Array<RolesEnums>,
@@ -117,9 +130,23 @@ export default function CreateUserForm(props: CreateUserFormProps) {
     });
   };
 
+  const initializeData = () => {
+    if (userDetails) {
+      const { dob, ...other } = userDetails;
+      form.reset({
+        ...other,
+        dob: dob ? new Date(dob) : undefined,
+      });
+    }
+  };
+
+  useEffect(initializeData, [userDetails]);
+
   return (
     <Form {...form}>
-      {createUserMutation.isPending && <Spinner centered fullScreen />}
+      {(updateUserMutation.isPending || isLoading) && (
+        <Spinner centered fullScreen />
+      )}
       <form
         className="mt-4 grid grid-cols-2 gap-6"
         onSubmit={form.handleSubmit(onPressSubmit)}
@@ -129,8 +156,18 @@ export default function CreateUserForm(props: CreateUserFormProps) {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
-              <Input {...field} type="email" placeholder="Email Address*" />
+              <FormLabel className="relative">
+                Email
+                <span className="absolute top-1/2 -translate-y-1/2 -right-2/3">
+                  <TooltipInfo infoText="Email can't be change, ask the developer to change it" />
+                </span>
+              </FormLabel>
+              <Input
+                {...field}
+                type="email"
+                placeholder="Email Address*"
+                disabled
+              />
               <FormMessage />
             </FormItem>
           )}
@@ -262,7 +299,7 @@ export default function CreateUserForm(props: CreateUserFormProps) {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Province</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Select province*" />
@@ -297,7 +334,7 @@ export default function CreateUserForm(props: CreateUserFormProps) {
             type="submit"
             disabled={!form.formState.isDirty}
           >
-            Create
+            Update
           </Button>
         </div>
       </form>
@@ -305,11 +342,12 @@ export default function CreateUserForm(props: CreateUserFormProps) {
   );
 }
 
-type CreateUserFormProps = {
+type JobFormProps = {
+  user: GetUserDetailsResponseType;
   companies: Array<GetCompaniesResponse>;
 };
 
-type FormValues = {
+type UpdateUserDetailsFormValues = {
   email: string;
   first_name: string;
   last_name: string;

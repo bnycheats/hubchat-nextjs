@@ -1,14 +1,14 @@
 import { createContext, PropsWithChildren, useEffect, useState } from "react";
 import { auth } from "@/firebase/client/firebase";
-import { getUser } from "@/firebase/client/queries/auth";
-import { type UserDetailsType } from "@/helpers/types";
+import { getUser } from "@/firebase/client/queries/users";
+import { type GetUserDetailsResponseType } from "@/firebase/client/queries/users/types";
 import { useQuery } from "@tanstack/react-query";
 import { type User } from "firebase/auth";
 
 export interface AuthContextType {
   loading: boolean;
   authUser: User | null;
-  userDetails?: UserDetailsType;
+  userDetails?: GetUserDetailsResponseType;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(

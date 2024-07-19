@@ -15,7 +15,7 @@ import {
   type ChangePasswordPayloadType,
   type ForgotPasswordPayloadType,
   type LoginPayloadType,
-  type UpdateUserProfilePayloadType,
+  type UpdateDisplayNamePayloadType,
 } from "./types";
 
 export function login({ email, password, rememberMe }: LoginPayloadType) {
@@ -40,10 +40,10 @@ export function changePassword({
   return updatePassword(user, newPassword);
 }
 
-export function updateUserProfile({
+export function updateUserDisplayName({
   user,
   displayName,
-}: UpdateUserProfilePayloadType) {
+}: UpdateDisplayNamePayloadType) {
   return updateProfile(user, { displayName });
 }
 

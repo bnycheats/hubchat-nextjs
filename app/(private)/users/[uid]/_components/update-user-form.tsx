@@ -1,9 +1,9 @@
 "use client";
 
 import provinces from "@/constants/provinces";
-import { updateUser, getUser } from "@/firebase/client/mutations/users";
+import { updateUser } from "@/firebase/client/mutations/users";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { useForm, type SubmitHandler } from "react-hook-form";
@@ -13,7 +13,6 @@ import roles from "@/constants/roles";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import { useEffect } from "react";
 import {
   Form,
   FormControl,
@@ -24,8 +23,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { MultiSelect, type OptionType } from "@/components/ui/multi-select";
-import { AiOutlineEye } from "react-icons/ai";
-import Link from "next/link";
 import {
   Popover,
   PopoverContent,
@@ -44,9 +41,8 @@ import { useToast } from "@/components/ui/use-toast";
 import { RolesEnums } from "@/helpers/types";
 import TooltipInfo from "@/components/tooltip-info";
 import { type UpdateUserPayloadType } from "@/firebase/client/mutations/users/types";
-import { type UserDetailsFormValues } from "@/helpers/types";
 import Spinner from "@/components/spinner";
-import { type UserDetailsType } from "@/helpers/types";
+import { type GetUserDetailsResponseType } from "@/firebase/client/queries/users/types";
 import { type GetCompaniesResponse } from "@/firebase/client/queries/companies/types";
 
 const FormSchema = z.object({
@@ -67,32 +63,38 @@ const FormSchema = z.object({
 });
 
 export default function UpdateUserForm(props: UpdateUserFormProps) {
-  const { user: userInitialData, companies } = props;
+  const { user, companies: companyOptions } = props;
 
   const { toast } = useToast();
-  const queryClient = useQueryClient();
   const { uid } = useParams<{ uid: string }>();
 
-  const { data: userDetails, isLoading } = useQuery({
-    queryKey: ["User", uid],
-    queryFn: async () => getUser({ userId: uid }),
-    initialData: userInitialData,
-  });
+  const {
+    dob,
+    email,
+    companies,
+    first_name,
+    last_name,
+    phone_number,
+    postal_code,
+    province,
+    role,
+    street,
+  } = user;
 
-  const defaultValues: UserDetailsFormValues = {
-    email: "",
-    first_name: "",
-    last_name: "",
-    dob: new Date(),
-    role: [],
-    phone_number: "",
-    street: "",
-    province: "",
-    postal_code: "",
-    companies: [],
+  const defaultValues: FormValues = {
+    dob: new Date(dob),
+    email,
+    first_name,
+    last_name,
+    role,
+    phone_number,
+    street,
+    province,
+    postal_code,
+    companies,
   };
 
-  const form = useForm<UserDetailsFormValues>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(FormSchema),
     defaultValues,
   });
@@ -104,12 +106,6 @@ export default function UpdateUserForm(props: UpdateUserFormProps) {
         variant: "success",
         title: "User details updated successfully",
       });
-      form.reset(form.watch(), {
-        keepValues: false,
-        keepDirty: false,
-        keepDefaultValues: false,
-      });
-      queryClient.invalidateQueries({ queryKey: ["User"] });
     },
     onError: (error: any) =>
       toast({
@@ -118,7 +114,7 @@ export default function UpdateUserForm(props: UpdateUserFormProps) {
       }),
   });
 
-  const onPressSubmit: SubmitHandler<UserDetailsFormValues> = (payload) => {
+  const onPressSubmit: SubmitHandler<FormValues> = (payload) => {
     const { dob, role, ...other } = payload;
     updateUserMutation.mutate({
       userId: uid,
@@ -130,229 +126,218 @@ export default function UpdateUserForm(props: UpdateUserFormProps) {
     });
   };
 
-  const initializeData = () => {
-    if (userDetails) {
-      const { dob, ...other } = userDetails;
-      form.reset({
-        ...other,
-        dob: dob ? new Date(dob) : undefined,
-      });
-    }
-  };
-
-  useEffect(initializeData, [userDetails]);
-
   return (
-    <section>
-      {(updateUserMutation.isPending || isLoading) && (
-        <Spinner centered fullScreen />
-      )}
-      <div className="flex items-center gap-4 mb-6">
-        <h2 className="text-3xl">User Details</h2>
-        <Link href="/create-user">
-          <Button className="rounded-full" variant="secondary" size="sm">
-            <AiOutlineEye /> Jobs
+    <Form {...form}>
+      {updateUserMutation.isPending && <Spinner centered fullScreen />}
+      <form
+        className="mt-4 grid grid-cols-2 gap-6"
+        onSubmit={form.handleSubmit(onPressSubmit)}
+      >
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="relative">
+                Email
+                <span className="absolute top-1/2 -translate-y-1/2 -right-2/3">
+                  <TooltipInfo infoText="Email can't be change, ask the developer to change it" />
+                </span>
+              </FormLabel>
+              <Input
+                {...field}
+                type="email"
+                placeholder="Email Address*"
+                disabled
+              />
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="dob"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Date of birth</FormLabel>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full pl-3 text-left font-normal",
+                      !field.value && "text-muted-foreground"
+                    )}
+                  >
+                    {field.value ? (
+                      format(field.value, "PPP")
+                    ) : (
+                      <span>Pick a date</span>
+                    )}
+                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={field.value}
+                    onSelect={field.onChange}
+                    disabled={(date) =>
+                      date > new Date() || date < new Date("1900-01-01")
+                    }
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="first_name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>First name</FormLabel>
+              <Input {...field} placeholder="First name*" />
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="last_name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Last name</FormLabel>
+              <Input {...field} placeholder="Last name*" />
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="role"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Roles</FormLabel>
+              <MultiSelect
+                options={roles}
+                selected={field.value ?? []}
+                onChange={field.onChange}
+              />
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="companies"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Companies</FormLabel>
+              <MultiSelect
+                options={
+                  companyOptions?.reduce((newItem: Array<OptionType>, item) => {
+                    return [
+                      ...newItem,
+                      { label: item.company_name, value: item.id },
+                    ];
+                  }, []) ?? []
+                }
+                displayLabel={true}
+                selected={field.value ?? []}
+                onChange={field.onChange}
+              />
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="phone_number"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Phone number</FormLabel>
+              <Input {...field} placeholder="Phone number*" />
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="postal_code"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Postal code</FormLabel>
+              <Input {...field} placeholder="Postal code*" />
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="province"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Province</FormLabel>
+              <Select onValueChange={field.onChange} value={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select province*" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {provinces.map((item, index) => (
+                    <SelectItem key={index} value={item.value}>
+                      {item.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="street"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Street</FormLabel>
+              <Textarea {...field} placeholder="Street*" />
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <div className="col-span-2 flex justify-end gap-3">
+          <Button
+            className="rounded-full w-28"
+            type="submit"
+            disabled={!form.formState.isDirty}
+          >
+            Update
           </Button>
-        </Link>
-      </div>
-      <Form {...form}>
-        <form
-          className="mt-4 grid grid-cols-2 gap-6"
-          onSubmit={form.handleSubmit(onPressSubmit)}
-        >
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="relative">
-                  Email
-                  <span className="absolute top-1/2 -translate-y-1/2 -right-2/3">
-                    <TooltipInfo infoText="Email can't be change, ask the developer to change it" />
-                  </span>
-                </FormLabel>
-                <Input
-                  {...field}
-                  type="email"
-                  placeholder="Email Address*"
-                  disabled
-                />
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="dob"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Date of birth</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full pl-3 text-left font-normal",
-                        !field.value && "text-muted-foreground"
-                      )}
-                    >
-                      {field.value ? (
-                        format(field.value, "PPP")
-                      ) : (
-                        <span>Pick a date</span>
-                      )}
-                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      disabled={(date) =>
-                        date > new Date() || date < new Date("1900-01-01")
-                      }
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="first_name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>First name</FormLabel>
-                <Input {...field} placeholder="First name*" />
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="last_name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Last name</FormLabel>
-                <Input {...field} placeholder="Last name*" />
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="role"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Roles</FormLabel>
-                <MultiSelect
-                  options={roles}
-                  selected={field.value ?? []}
-                  onChange={field.onChange}
-                />
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="companies"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Companies</FormLabel>
-                <MultiSelect
-                  options={
-                    companies?.reduce((newItem: Array<OptionType>, item) => {
-                      return [
-                        ...newItem,
-                        { label: item.company_name, value: item.id },
-                      ];
-                    }, []) ?? []
-                  }
-                  displayLabel={true}
-                  selected={field.value ?? []}
-                  onChange={field.onChange}
-                />
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="phone_number"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Phone number</FormLabel>
-                <Input {...field} placeholder="Phone number*" />
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="postal_code"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Postal code</FormLabel>
-                <Input {...field} placeholder="Postal code*" />
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="province"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Province</FormLabel>
-                <Select onValueChange={field.onChange} value={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select province*" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {provinces.map((item, index) => (
-                      <SelectItem key={index} value={item.value}>
-                        {item.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="street"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Street</FormLabel>
-                <Textarea {...field} placeholder="Street*" />
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <div className="col-span-2 flex justify-end gap-3">
-            <Button
-              className="rounded-full w-28"
-              type="submit"
-              disabled={!form.formState.isDirty}
-            >
-              Update
-            </Button>
-          </div>
-        </form>
-      </Form>
-    </section>
+        </div>
+      </form>
+    </Form>
   );
 }
 
 type UpdateUserFormProps = {
-  user: UserDetailsType;
+  user: GetUserDetailsResponseType;
   companies: Array<GetCompaniesResponse>;
+};
+
+type FormValues = {
+  email: string;
+  first_name: string;
+  last_name: string;
+  dob: Date;
+  role: Array<string>;
+  phone_number: string;
+  street: string;
+  province: string;
+  postal_code: string;
+  companies: Array<string>;
 };

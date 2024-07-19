@@ -1,5 +1,5 @@
 import { type User } from "firebase/auth";
-import { type UserDetailsType } from "@/helpers/types";
+import { RolesEnums } from "@/helpers/types";
 
 export type LoginPayloadType = {
   email: string;
@@ -16,12 +16,22 @@ export type ChangePasswordPayloadType = {
   newPassword: string;
 };
 
-export type UpdateUserProfilePayloadType = {
+export type UpdateDisplayNamePayloadType = {
   user: User;
   displayName: string;
 };
 
 export type CreateUserPayloadType = {
   email: string;
-  payload: Partial<UserDetailsType>;
+  payload: {
+    first_name: string;
+    last_name: string;
+    dob: number;
+    phone_number: string;
+    province: string;
+    street: string;
+    postal_code: string;
+    role: Array<RolesEnums>;
+    companies: Array<string>;
+  };
 };
