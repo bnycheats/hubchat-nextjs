@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
     await admin.firestore().collection("Users").doc(user.uid).set({
       uid: user.uid,
       email: user.email,
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      created_at: admin.firestore.FieldValue.serverTimestamp(),
       status: "ACTIVE",
       first_name,
       last_name,

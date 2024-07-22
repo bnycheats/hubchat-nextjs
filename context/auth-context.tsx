@@ -5,12 +5,6 @@ import { type GetUserDetailsResponseType } from "@/firebase/client/queries/users
 import { useQuery } from "@tanstack/react-query";
 import { type User } from "firebase/auth";
 
-export interface AuthContextType {
-  loading: boolean;
-  authUser: User | null;
-  userDetails?: GetUserDetailsResponseType;
-}
-
 export const AuthContext = createContext<AuthContextType | undefined>(
   undefined
 );
@@ -20,7 +14,7 @@ export const AuthProvider = (props: PropsWithChildren) => {
   const [authUser, setAuthUser] = useState<User | null>(null);
 
   const { data: userDetails, isLoading: userDetailsLoading } = useQuery({
-    queryKey: ["Users", authUser?.uid],
+    queryKey: ["User", authUser?.uid],
     queryFn: async () => getUser({ userId: authUser?.uid ?? "" }),
     enabled: !!authUser?.uid,
   });
@@ -43,4 +37,10 @@ export const AuthProvider = (props: PropsWithChildren) => {
   return (
     <AuthContext.Provider value={value}>{props.children}</AuthContext.Provider>
   );
+};
+
+export type AuthContextType = {
+  loading: boolean;
+  authUser: User | null;
+  userDetails?: GetUserDetailsResponseType;
 };

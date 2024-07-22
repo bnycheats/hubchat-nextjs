@@ -1,4 +1,4 @@
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { doc, updateDoc } from "firebase/firestore";
 
 import { db } from "../../firebase";
 import { type UpdateUserPayloadType } from "./types";

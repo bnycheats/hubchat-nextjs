@@ -62,7 +62,7 @@ function UpdateFullNameModal(props: UpdateFullNameModalProps) {
         keepDirty: false,
         keepDefaultValues: false,
       });
-      queryClient.invalidateQueries({ queryKey: ["Users"] });
+      queryClient.invalidateQueries({ queryKey: ["User"] });
       closeModal();
     },
     onError: (error: any) =>

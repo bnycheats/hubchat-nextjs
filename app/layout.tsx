@@ -2,7 +2,7 @@
 
 import { Inter } from "next/font/google";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { AuthProvider } from "@/context/authContext";
+import { AuthProvider } from "@/context/auth-context";
 import { Toaster } from "@/components/ui/toaster";
 
 import "./globals.css";

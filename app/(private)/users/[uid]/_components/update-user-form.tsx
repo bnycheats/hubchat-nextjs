@@ -3,7 +3,7 @@
 import provinces from "@/constants/provinces";
 import { updateUser } from "@/firebase/client/mutations/users";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { useForm, type SubmitHandler } from "react-hook-form";
@@ -42,8 +42,7 @@ import { RolesEnums } from "@/helpers/types";
 import TooltipInfo from "@/components/tooltip-info";
 import { type UpdateUserPayloadType } from "@/firebase/client/mutations/users/types";
 import Spinner from "@/components/spinner";
-import { type GetUserDetailsResponseType } from "@/firebase/client/queries/users/types";
-import { type GetCompaniesResponse } from "@/firebase/client/queries/companies/types";
+import useUser from "../_hooks/useUser";
 
 const FormSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -62,10 +61,11 @@ const FormSchema = z.object({
   postal_code: z.string().min(1, { message: "This field is required" }),
 });
 
-export default function UpdateUserForm(props: UpdateUserFormProps) {
-  const { user, companies: companyOptions } = props;
+export default function UpdateUserForm() {
+  const { user, companies: companyOptions } = useUser();
 
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const { uid } = useParams<{ uid: string }>();
 
   const {
@@ -106,6 +106,13 @@ export default function UpdateUserForm(props: UpdateUserFormProps) {
         variant: "success",
         title: "User details updated successfully",
       });
+      queryClient.invalidateQueries({ queryKey: ["SpecificUser"] }).then(() =>
+        form.reset(form.watch(), {
+          keepValues: false,
+          keepDirty: false,
+          keepDefaultValues: false,
+        })
+      );
     },
     onError: (error: any) =>
       toast({
@@ -314,7 +321,7 @@ export default function UpdateUserForm(props: UpdateUserFormProps) {
           <Button
             className="rounded-full w-28"
             type="submit"
-            disabled={!form.formState.isDirty}
+            disabled={!form.formState.isDirty || !form.formState.isValid}
           >
             Update
           </Button>
@@ -323,11 +330,6 @@ export default function UpdateUserForm(props: UpdateUserFormProps) {
     </Form>
   );
 }
-
-type UpdateUserFormProps = {
-  user: GetUserDetailsResponseType;
-  companies: Array<GetCompaniesResponse>;
-};
 
 type FormValues = {
   email: string;

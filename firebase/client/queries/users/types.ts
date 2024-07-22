@@ -6,7 +6,7 @@ export type GetUserPayloadType = {
 
 export type GetUserDetailsResponseType = {
   email: string;
-  creation_date: number;
+  created_at: number;
   first_name: string;
   last_name: string;
   dob: number;

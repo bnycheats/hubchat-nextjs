@@ -23,6 +23,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import currencies from "@/constants/currencies";
 import { Input } from "@/components/ui/input";
 import { MultiSelect, type OptionType } from "@/components/ui/multi-select";
 import {
@@ -44,271 +45,96 @@ import { RolesEnums } from "@/helpers/types";
 import TooltipInfo from "@/components/tooltip-info";
 import { type UpdateUserPayloadType } from "@/firebase/client/mutations/users/types";
 import Spinner from "@/components/spinner";
-import { type GetCompaniesResponse } from "@/firebase/client/queries/companies/types";
+import { type GetCompanyResponse } from "@/firebase/client/queries/companies/types";
 import { type GetUserDetailsResponseType } from "@/firebase/client/queries/users/types";
 
 const FormSchema = z.object({
-  email: z.string().email({ message: "Please enter a valid email address" }),
-  first_name: z.string().min(1, { message: "This field is required" }),
-  last_name: z.string().min(1, { message: "This field is required" }),
-  dob: z.date({
-    required_error: "A date of birth is required.",
-  }),
-  role: z.array(z.string()).nonempty({ message: "This field is required" }),
-  companies: z
-    .array(z.string())
-    .nonempty({ message: "This field is required" }),
-  phone_number: z.string().min(1, { message: "This field is required" }),
-  street: z.string().min(1, { message: "This field is required" }),
-  province: z.string().min(1, { message: "This field is required" }),
-  postal_code: z.string().min(1, { message: "This field is required" }),
+  commission_rate: z.number().min(1, { message: "This field is required" }),
+  currency: z.string().min(3, { message: "This field is required" }),
 });
 
-export default function JobForm(props: JobFormProps) {
-  const { user: userInitialData, companies } = props;
-
+export default function JobForm() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { uid } = useParams<{ uid: string }>();
 
-  const { data: userDetails, isLoading } = useQuery({
-    queryKey: ["User", uid],
-    queryFn: async () => getUser({ userId: uid }),
-    initialData: userInitialData,
-  });
-
-  const defaultValues: UpdateUserDetailsFormValues = {
-    email: "",
-    first_name: "",
-    last_name: "",
-    dob: new Date(),
-    role: [],
-    phone_number: "",
-    street: "",
-    province: "",
-    postal_code: "",
-    companies: [],
+  const defaultValues: FormValues = {
+    commission_rate: undefined,
+    currency: "",
   };
 
-  const form = useForm<UpdateUserDetailsFormValues>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(FormSchema),
     defaultValues,
   });
 
-  const updateUserMutation = useMutation({
-    mutationFn: (request: UpdateUserPayloadType) => updateUser(request),
-    onSuccess: () => {
-      toast({
-        variant: "success",
-        title: "User details updated successfully",
-      });
-      form.reset(form.watch(), {
-        keepValues: false,
-        keepDirty: false,
-        keepDefaultValues: false,
-      });
-      queryClient.invalidateQueries({ queryKey: ["User"] });
-    },
-    onError: (error: any) =>
-      toast({
-        variant: "destructive",
-        title: `Error updating user details: ${error}`,
-      }),
+  const updateCreateUserJobMutation = useMutation({
+    // mutationFn: (request: UpdateUserPayloadType) => updateUser(request),
+    // onSuccess: () => {
+    //   toast({
+    //     variant: "success",
+    //     title: "User details updated successfully",
+    //   });
+    //   form.reset(form.watch(), {
+    //     keepValues: false,
+    //     keepDirty: false,
+    //     keepDefaultValues: false,
+    //   });
+    //   queryClient.invalidateQueries({ queryKey: ["User"] });
+    // },
+    // onError: (error: any) =>
+    //   toast({
+    //     variant: "destructive",
+    //     title: `Error updating user details: ${error}`,
+    //   }),
   });
 
-  const onPressSubmit: SubmitHandler<UpdateUserDetailsFormValues> = (
-    payload
-  ) => {
-    const { dob, role, ...other } = payload;
-    updateUserMutation.mutate({
-      userId: uid,
-      payload: {
-        ...other,
-        role: role as Array<RolesEnums>,
-        dob: dob.getTime(),
-      },
-    });
-  };
-
-  const initializeData = () => {
-    if (userDetails) {
-      const { dob, ...other } = userDetails;
-      form.reset({
-        ...other,
-        dob: dob ? new Date(dob) : undefined,
-      });
-    }
-  };
-
-  useEffect(initializeData, [userDetails]);
+  // const onPressSubmit: SubmitHandler<UpdateUserDetailsFormValues> = (
+  //   payload
+  // ) => {
+  //   const { dob, role, ...other } = payload;
+  //   updateUserMutation.mutate({
+  //     userId: uid,
+  //     payload: {
+  //       ...other,
+  //       role: role as Array<RolesEnums>,
+  //       dob: dob.getTime(),
+  //     },
+  //   });
+  // };
 
   return (
     <Form {...form}>
-      {(updateUserMutation.isPending || isLoading) && (
-        <Spinner centered fullScreen />
-      )}
       <form
         className="mt-4 grid grid-cols-2 gap-6"
-        onSubmit={form.handleSubmit(onPressSubmit)}
+        // onSubmit={form.handleSubmit(onPressSubmit)}
       >
         <FormField
           control={form.control}
-          name="email"
+          name="commission_rate"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="relative">
-                Email
-                <span className="absolute top-1/2 -translate-y-1/2 -right-2/3">
-                  <TooltipInfo infoText="Email can't be change, ask the developer to change it" />
-                </span>
-              </FormLabel>
-              <Input
-                {...field}
-                type="email"
-                placeholder="Email Address*"
-                disabled
-              />
+              <FormLabel>Commission rate</FormLabel>
+              <Input {...field} type="number" placeholder="Commission rate*" />
               <FormMessage />
             </FormItem>
           )}
         />
         <FormField
           control={form.control}
-          name="dob"
+          name="currency"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Date of birth</FormLabel>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "w-full pl-3 text-left font-normal",
-                      !field.value && "text-muted-foreground"
-                    )}
-                  >
-                    {field.value ? (
-                      format(field.value, "PPP")
-                    ) : (
-                      <span>Pick a date</span>
-                    )}
-                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={field.value}
-                    onSelect={field.onChange}
-                    disabled={(date) =>
-                      date > new Date() || date < new Date("1900-01-01")
-                    }
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="first_name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>First name</FormLabel>
-              <Input {...field} placeholder="First name*" />
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="last_name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Last name</FormLabel>
-              <Input {...field} placeholder="Last name*" />
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="role"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Roles</FormLabel>
-              <MultiSelect
-                options={roles}
-                selected={field.value ?? []}
-                onChange={field.onChange}
-              />
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="companies"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Companies</FormLabel>
-              <MultiSelect
-                options={
-                  companies?.reduce((newItem: Array<OptionType>, item) => {
-                    return [
-                      ...newItem,
-                      { label: item.company_name, value: item.id },
-                    ];
-                  }, []) ?? []
-                }
-                displayLabel={true}
-                selected={field.value ?? []}
-                onChange={field.onChange}
-              />
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="phone_number"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Phone number</FormLabel>
-              <Input {...field} placeholder="Phone number*" />
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="postal_code"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Postal code</FormLabel>
-              <Input {...field} placeholder="Postal code*" />
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="province"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Province</FormLabel>
-              <Select onValueChange={field.onChange} value={field.value}>
+              <FormLabel>Currency</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select province*" />
+                    <SelectValue placeholder="Select currency*" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {provinces.map((item, index) => (
-                    <SelectItem key={index} value={item.value}>
-                      {item.name}
+                  {Object.keys(currencies).map((item, index) => (
+                    <SelectItem key={index} value={item}>
+                      {item}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -317,24 +143,13 @@ export default function JobForm(props: JobFormProps) {
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="street"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Street</FormLabel>
-              <Textarea {...field} placeholder="Street*" />
-              <FormMessage />
-            </FormItem>
-          )}
-        />
         <div className="col-span-2 flex justify-end gap-3">
           <Button
-            className="rounded-full w-28"
+            className="rounded-full"
             type="submit"
             disabled={!form.formState.isDirty}
           >
-            Update
+            Create Account
           </Button>
         </div>
       </form>
@@ -342,20 +157,7 @@ export default function JobForm(props: JobFormProps) {
   );
 }
 
-type JobFormProps = {
-  user: GetUserDetailsResponseType;
-  companies: Array<GetCompaniesResponse>;
-};
-
-type UpdateUserDetailsFormValues = {
-  email: string;
-  first_name: string;
-  last_name: string;
-  dob: Date;
-  role: Array<string>;
-  phone_number: string;
-  street: string;
-  province: string;
-  postal_code: string;
-  companies: Array<string>;
+type FormValues = {
+  commission_rate: number | undefined;
+  currency: string;
 };

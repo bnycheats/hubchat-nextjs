@@ -1,4 +1,4 @@
-export type GetCompaniesResponse = {
+export type GetCompanyResponse = {
   id: string;
   commission_rate: string;
   company_name: string;

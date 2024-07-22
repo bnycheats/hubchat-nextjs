@@ -1,6 +1,6 @@
-import { type GetCompaniesResponse } from "@/firebase/client/queries/companies/types";
+import { type GetCompanyResponse } from "@/firebase/client/queries/companies/types";
 
-function CompanyDetailsSection(props: GetCompaniesResponse) {
+function CompanyDetailsSection(props: GetCompanyResponse) {
   return (
     <section className="border-b pb-4">
       {props?.company_name && (

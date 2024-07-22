@@ -42,7 +42,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { RolesEnums } from "@/helpers/types";
 import { useRouter } from "next/navigation";
-import { type GetCompaniesResponse } from "@/firebase/client/queries/companies/types";
+import { type GetCompanyResponse } from "@/firebase/client/queries/companies/types";
 
 const FormSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -93,16 +93,22 @@ export default function CreateUserForm(props: CreateUserFormProps) {
         variant: "success",
         title: "User created successfully",
       });
-      form.reset({});
-      queryClient.invalidateQueries({ queryKey: ["Users"] });
+      queryClient.invalidateQueries({ queryKey: ["SpecificUser"] }).then(() =>
+        form.reset(
+          {},
+          {
+            keepValues: false,
+            keepDirty: false,
+            keepDefaultValues: false,
+          }
+        )
+      );
     },
-    onError: (error: any) => {
-      console.log(error);
+    onError: (error: any) =>
       toast({
         variant: "destructive",
         title: error?.toString(),
-      });
-    },
+      }),
   });
 
   const onPressSubmit: SubmitHandler<FormValues> = (payload) => {
@@ -306,7 +312,7 @@ export default function CreateUserForm(props: CreateUserFormProps) {
 }
 
 type CreateUserFormProps = {
-  companies: Array<GetCompaniesResponse>;
+  companies: Array<GetCompanyResponse>;
 };
 
 type FormValues = {
