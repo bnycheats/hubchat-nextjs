@@ -321,7 +321,7 @@ export default function UpdateUserForm() {
           <Button
             className="rounded-full w-28"
             type="submit"
-            disabled={!form.formState.isDirty || !form.formState.isValid}
+            disabled={!form.formState.isDirty}
           >
             Update
           </Button>

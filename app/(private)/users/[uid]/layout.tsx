@@ -16,7 +16,7 @@ export default async function UserLayout(props: UserLayoutProps) {
     const user = await getUser({ userId: params.uid });
     const companies = await getCompanies();
     return (
-      <UserProvider user={user} companies={companies}>
+      <UserProvider user={user} companies={companies} userId={params.uid}>
         {children}
       </UserProvider>
     );
