@@ -51,7 +51,7 @@ function MultiSelect({
           className={cn(
             "w-full justify-between",
             className,
-            selected.length > 1 ? "h-full" : "h-10"
+            selected.length > 1 ? "h-auto" : "h-10"
           )}
           onClick={() => setOpen(!open)}
         >
