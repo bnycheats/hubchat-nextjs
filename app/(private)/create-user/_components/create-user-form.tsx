@@ -42,7 +42,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { RolesEnums } from "@/helpers/types";
 import { useRouter } from "next/navigation";
-import { type GetCompanyResponse } from "@/firebase/client/queries/companies/types";
 
 const FormSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -52,17 +51,13 @@ const FormSchema = z.object({
     required_error: "A date of birth is required.",
   }),
   role: z.array(z.string()).nonempty({ message: "This field is required" }),
-  companies: z
-    .array(z.string())
-    .nonempty({ message: "This field is required" }),
   phone_number: z.string().min(1, { message: "This field is required" }),
   street: z.string().min(1, { message: "This field is required" }),
   province: z.string().min(1, { message: "This field is required" }),
   postal_code: z.string().min(1, { message: "This field is required" }),
 });
 
-export default function CreateUserForm(props: CreateUserFormProps) {
-  const { companies } = props;
+export default function CreateUserForm() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const router = useRouter();
@@ -77,7 +72,6 @@ export default function CreateUserForm(props: CreateUserFormProps) {
     street: "",
     province: "",
     postal_code: "",
-    companies: [],
   };
 
   const form = useForm<FormValues>({
@@ -88,21 +82,13 @@ export default function CreateUserForm(props: CreateUserFormProps) {
   const createUserMutation = useMutation({
     mutationFn: (request: CreateUserPayloadType) => createUser(request),
     onSuccess: (data) => {
-      router.push(`/users/${data?.uid}/jobs`);
+      router.push(`/users/${data?.uid}/create-account`);
       toast({
         variant: "success",
         title: "User created successfully",
       });
-      queryClient.invalidateQueries({ queryKey: ["SpecificUser"] }).then(() =>
-        form.reset(
-          {},
-          {
-            keepValues: false,
-            keepDirty: false,
-            keepDefaultValues: false,
-          }
-        )
-      );
+      form.reset();
+      queryClient.invalidateQueries({ queryKey: ["Users"] });
     },
     onError: (error: any) =>
       toast({
@@ -219,29 +205,6 @@ export default function CreateUserForm(props: CreateUserFormProps) {
         />
         <FormField
           control={form.control}
-          name="companies"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Companies</FormLabel>
-              <MultiSelect
-                options={
-                  companies?.reduce((newItem: Array<OptionType>, item) => {
-                    return [
-                      ...newItem,
-                      { label: item.company_name, value: item.id },
-                    ];
-                  }, []) ?? []
-                }
-                displayLabel={true}
-                selected={field.value ?? []}
-                onChange={field.onChange}
-              />
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
           name="phone_number"
           render={({ field }) => (
             <FormItem>
@@ -311,10 +274,6 @@ export default function CreateUserForm(props: CreateUserFormProps) {
   );
 }
 
-type CreateUserFormProps = {
-  companies: Array<GetCompanyResponse>;
-};
-
 type FormValues = {
   email: string;
   first_name: string;
@@ -325,5 +284,4 @@ type FormValues = {
   street: string;
   province: string;
   postal_code: string;
-  companies: Array<string>;
 };

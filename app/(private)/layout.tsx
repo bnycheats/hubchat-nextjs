@@ -1,67 +1,25 @@
-"use client";
+import { type PropsWithChildren } from "react";
+import { Metadata } from "next";
+import { notFound } from "next/navigation";
 
-import { ReactNode } from "react";
-import { redirect } from "next/navigation";
-import { useState } from "react";
+import { getCompanies } from "@/firebase/client/queries/companies";
 
-import useAuth from "@/hooks/useAuth";
-import Spinner from "@/components/spinner";
+import { PrivateProvider } from "./_context/private-provider";
 
-import { RolesEnums } from "@/helpers/types";
-import { AiOutlineAppstore, AiOutlineTeam } from "react-icons/ai";
-
-import Header from "@/components/header";
-import { type MenuModelType } from "@/components/menu";
-import Sidebar from "@/components/sidebar";
-
-export default function PrivateLayout({ children }: { children: ReactNode }) {
-  const { loading, authUser, userDetails } = useAuth();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  const menuItems: MenuModelType[] = getMenus(userDetails?.role);
-
-  if (loading) return <Spinner centered fullScreen />;
-
-  if (!authUser) redirect("/login");
-
-  return (
-    <section className="flex h-screen overflow-hidden">
-      <Sidebar
-        model={menuItems}
-        sidebarOpen={sidebarOpen}
-        setSidebarOpen={setSidebarOpen}
-      />
-      <div className="relative flex flex-1 flex-col overflow-y-auto overflow-x-hidden">
-        <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-        <main>
-          <div className="mx-auto max-w-[968px] px-4 py-4 xl:px-0">
-            {children}
-          </div>
-        </main>
-      </div>
-    </section>
-  );
+/**
+ * The Layout is needed to specify the page title and meta tags.
+ */
+export default async function PrivateLayout(props: PropsWithChildren) {
+  try {
+    const { children } = props;
+    const companies = await getCompanies();
+    return <PrivateProvider companies={companies}>{children}</PrivateProvider>;
+  } catch (e) {
+    notFound();
+  }
 }
 
-function getMenus(role?: Array<RolesEnums>): MenuModelType[] {
-  return [
-    {
-      label: "MENU",
-      items: [
-        {
-          itemKey: "dashboard",
-          to: "/dashboard",
-          label: "Dashboard",
-          icon: <AiOutlineAppstore />,
-        },
-        {
-          hidden: !role?.includes(RolesEnums.ADMIN),
-          itemKey: "users",
-          to: "/users",
-          label: "Users",
-          icon: <AiOutlineTeam />,
-        },
-      ],
-    },
-  ];
-}
+export const metadata: Metadata = {
+  title: "User Details",
+  robots: "noindex",
+};

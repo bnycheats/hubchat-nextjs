@@ -5,6 +5,7 @@ export type GetUserPayloadType = {
 };
 
 export type GetUserDetailsResponseType = {
+  uid: string;
   email: string;
   created_at: number;
   first_name: string;
@@ -16,5 +17,4 @@ export type GetUserDetailsResponseType = {
   street: string;
   postal_code: string;
   role: Array<RolesEnums>;
-  companies: Array<string>;
 };

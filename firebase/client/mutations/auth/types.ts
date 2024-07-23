@@ -32,6 +32,5 @@ export type CreateUserPayloadType = {
     street: string;
     postal_code: string;
     role: Array<RolesEnums>;
-    companies: Array<string>;
   };
 };

@@ -4,11 +4,15 @@ import { Metadata } from "next";
 /**
  * The Layout is needed to specify the page title and meta tags.
  */
-export default function UserJobsLayout({ children }: { children: ReactNode }) {
+export default function UserAccountsLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
   return <>{children}</>;
 }
 
 export const metadata: Metadata = {
-  title: "User Jobs",
+  title: "User Accounts",
   robots: "noindex",
 };

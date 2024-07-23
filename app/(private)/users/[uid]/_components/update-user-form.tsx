@@ -22,7 +22,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { MultiSelect, type OptionType } from "@/components/ui/multi-select";
+import { MultiSelect } from "@/components/ui/multi-select";
 import {
   Popover,
   PopoverContent,
@@ -52,9 +52,6 @@ const FormSchema = z.object({
     required_error: "A date of birth is required.",
   }),
   role: z.array(z.string()).nonempty({ message: "This field is required" }),
-  companies: z
-    .array(z.string())
-    .nonempty({ message: "This field is required" }),
   phone_number: z.string().min(1, { message: "This field is required" }),
   street: z.string().min(1, { message: "This field is required" }),
   province: z.string().min(1, { message: "This field is required" }),
@@ -62,36 +59,16 @@ const FormSchema = z.object({
 });
 
 export default function UpdateUserForm() {
-  const { user, companies: companyOptions } = useUser();
-
+  const { user } = useUser();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { uid } = useParams<{ uid: string }>();
 
-  const {
-    dob,
-    email,
-    companies,
-    first_name,
-    last_name,
-    phone_number,
-    postal_code,
-    province,
-    role,
-    street,
-  } = user;
+  const { dob, ...other } = user;
 
   const defaultValues: FormValues = {
     dob: new Date(dob),
-    email,
-    first_name,
-    last_name,
-    role,
-    phone_number,
-    street,
-    province,
-    postal_code,
-    companies,
+    ...other,
   };
 
   const form = useForm<FormValues>({
@@ -106,13 +83,12 @@ export default function UpdateUserForm() {
         variant: "success",
         title: "User details updated successfully",
       });
-      queryClient.invalidateQueries({ queryKey: ["SpecificUser"] }).then(() =>
-        form.reset(form.watch(), {
-          keepValues: false,
-          keepDirty: false,
-          keepDefaultValues: false,
-        })
-      );
+      form.reset(form.watch(), {
+        keepValues: false,
+        keepDirty: false,
+        keepDefaultValues: false,
+      });
+      queryClient.invalidateQueries({ queryKey: ["SpecificUser"] });
     },
     onError: (error: any) =>
       toast({
@@ -239,29 +215,6 @@ export default function UpdateUserForm() {
         />
         <FormField
           control={form.control}
-          name="companies"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Companies</FormLabel>
-              <MultiSelect
-                options={
-                  companyOptions?.reduce((newItem: Array<OptionType>, item) => {
-                    return [
-                      ...newItem,
-                      { label: item.company_name, value: item.id },
-                    ];
-                  }, []) ?? []
-                }
-                displayLabel={true}
-                selected={field.value ?? []}
-                onChange={field.onChange}
-              />
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
           name="phone_number"
           render={({ field }) => (
             <FormItem>
@@ -341,5 +294,4 @@ type FormValues = {
   street: string;
   province: string;
   postal_code: string;
-  companies: Array<string>;
 };
