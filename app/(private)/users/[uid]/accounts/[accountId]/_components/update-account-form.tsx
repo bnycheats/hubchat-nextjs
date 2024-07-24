@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/form";
 import currencies from "@/constants/currencies";
 import { Input } from "@/components/ui/input";
-import CompanyDetails from "../../_components/comany-details";
+import CompanyDetails from "../../../_components/comany-details";
 import {
   Select,
   SelectContent,
@@ -28,12 +28,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
-import { createAccount } from "@/firebase/client/mutations/accounts";
-import { type CreateAccountPayloadType } from "@/firebase/client/mutations/accounts/types";
+import { updateAccount } from "@/firebase/client/mutations/accounts";
+import { type UpdateAccountPayloadType } from "@/firebase/client/mutations/accounts/types";
 import useCompanies from "@/app/(private)/_hooks/useCompanies";
-import useUser from "../../_hooks/useUser";
 import Spinner from "@/components/spinner";
 import convertToCents from "@/utils/convertToCents";
+import { type GetAccountResponseType } from "@/firebase/client/queries/accounts/types";
+import convertToAmount from "@/utils/convertToAmount";
+import { getAccount } from "@/firebase/client/queries/accounts";
+import { useQuery } from "@tanstack/react-query";
 
 const FormSchema = z.object({
   company_id: z.string().min(1, { message: "This field is required" }),
@@ -78,24 +81,26 @@ const FormSchema = z.object({
   role: z.string().min(1, { message: "This field is required" }),
 });
 
-export default function CreateAccountForm() {
+export default function UpdateAccountForm(props: UpdateAccountFormProps) {
+  const { account: initialData, accountId } = props;
   const { companies } = useCompanies();
-  const { user } = useUser();
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  const { data: account } = useQuery({
+    queryKey: ["Account", accountId],
+    queryFn: async () => getAccount({ account_id: accountId }),
+    initialData,
+  });
+
+  const { per_day_rate, per_hour_rate, per_month_rate, ...other } = account;
+
   const defaultValues: FormValues = {
-    company_id: "",
-    currency: "",
-    account_name: "",
-    commission_rate: "",
-    expenses_rate: "",
-    over_time_rate: "",
-    per_hour_rate: "",
-    per_day_rate: "",
-    per_month_rate: "",
-    role: "",
+    per_day_rate: `${convertToAmount(Number(per_day_rate))}`,
+    per_hour_rate: `${convertToAmount(Number(per_hour_rate))}`,
+    per_month_rate: `${convertToAmount(Number(per_month_rate))}`,
+    ...other,
   };
 
   const form = useForm<FormValues>({
@@ -107,38 +112,37 @@ export default function CreateAccountForm() {
     (item) => item.id === form.watch("company_id")
   );
 
-  const createAccountMutation = useMutation({
-    mutationFn: (request: CreateAccountPayloadType) => createAccount(request),
+  const updateAccountMutation = useMutation({
+    mutationFn: (request: UpdateAccountPayloadType) => updateAccount(request),
     onSuccess: () => {
       toast({
         variant: "success",
-        title: "Account created successfully",
+        title: "Account updated successfully",
       });
-      form.reset();
-      queryClient.invalidateQueries({ queryKey: ["Accounts"] });
+      form.reset(form.watch(), {
+        keepValues: false,
+        keepDirty: false,
+        keepDefaultValues: false,
+      });
+      queryClient.invalidateQueries({ queryKey: ["Account"] });
     },
     onError: (error: any) =>
       toast({
         variant: "destructive",
-        title: `Error creating account: ${error}`,
+        title: `Error updating account: ${error}`,
       }),
   });
 
   const onPressSubmit: SubmitHandler<FormValues> = (payload) => {
-    const {
-      over_time_rate,
-      per_day_rate,
-      per_hour_rate,
-      per_month_rate,
-      ...other
-    } = payload;
-    createAccountMutation.mutate({
-      user_id: user.uid,
-      over_time_rate: `${convertToCents(Number(over_time_rate))}`,
-      per_day_rate: `${convertToCents(Number(per_day_rate))}`,
-      per_hour_rate: `${convertToCents(Number(per_hour_rate))}`,
-      per_month_rate: `${convertToCents(Number(per_month_rate))}`,
-      ...other,
+    const { per_day_rate, per_hour_rate, per_month_rate, ...other } = payload;
+    updateAccountMutation.mutate({
+      account_id: accountId,
+      payload: {
+        per_day_rate: `${convertToCents(Number(per_day_rate))}`,
+        per_hour_rate: `${convertToCents(Number(per_hour_rate))}`,
+        per_month_rate: `${convertToCents(Number(per_month_rate))}`,
+        ...other,
+      },
     });
   };
 
@@ -153,7 +157,7 @@ export default function CreateAccountForm() {
 
   return (
     <div>
-      {createAccountMutation.isPending && <Spinner centered fullScreen />}
+      {updateAccountMutation.isPending && <Spinner centered fullScreen />}
       {company && <CompanyDetails {...company} />}
       <section>
         <Form {...form}>
@@ -362,7 +366,7 @@ export default function CreateAccountForm() {
                 type="submit"
                 disabled={!form.formState.isDirty}
               >
-                Create
+                Update
               </Button>
             </div>
           </form>
@@ -383,4 +387,9 @@ type FormValues = {
   per_day_rate: string;
   per_month_rate: string;
   role: string;
+};
+
+type UpdateAccountFormProps = {
+  account: GetAccountResponseType;
+  accountId: string;
 };

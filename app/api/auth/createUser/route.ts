@@ -9,7 +9,6 @@ export async function POST(req: NextRequest) {
       password,
       displayName,
     });
-
     await admin
       .firestore()
       .collection("Users")
@@ -18,7 +17,7 @@ export async function POST(req: NextRequest) {
         uid: user.uid,
         email: user.email,
         created_at: admin.firestore.FieldValue.serverTimestamp(),
-        status: "ACTIVE",
+        active: true,
         ...other,
       });
     return NextResponse.json({ uid: user.uid }, { status: 201 });

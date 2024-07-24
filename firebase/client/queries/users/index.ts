@@ -11,11 +11,9 @@ export async function getUser({ userId }: GetUserPayloadType) {
 
   if (docSnap.exists()) {
     const user = docSnap.data() as GetUserDetailsResponseType;
-
     if (user.created_at) {
       user.created_at = (user.created_at as unknown as Timestamp).toMillis();
     }
-
     return user;
   } else {
     throw new Error("User not found!");

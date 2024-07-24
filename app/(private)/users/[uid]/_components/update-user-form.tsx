@@ -35,7 +35,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useParams } from "next/navigation";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { RolesEnums } from "@/helpers/types";
@@ -62,7 +61,6 @@ export default function UpdateUserForm() {
   const { user } = useUser();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { uid } = useParams<{ uid: string }>();
 
   const { dob, ...other } = user;
 
@@ -100,7 +98,7 @@ export default function UpdateUserForm() {
   const onPressSubmit: SubmitHandler<FormValues> = (payload) => {
     const { dob, role, ...other } = payload;
     updateUserMutation.mutate({
-      userId: uid,
+      userId: user.uid,
       payload: {
         ...other,
         role: role as Array<RolesEnums>,
