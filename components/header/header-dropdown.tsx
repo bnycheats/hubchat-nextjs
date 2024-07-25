@@ -1,8 +1,8 @@
-import { handleLogoutError } from "@/errors/logout-error";
-import { logout } from "@/firebase/client/mutations/auth";
-import useAuth from "@/hooks/useAuth";
-import { useMutation } from "@tanstack/react-query";
-import Link from "next/link";
+import { handleLogoutError } from '@/errors/logout-error';
+import { logout } from '@/firebase/client/mutations/auth';
+import useAuth from '@/hooks/useAuth';
+import { useMutation } from '@tanstack/react-query';
+import Link from 'next/link';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,11 +10,11 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { useToast } from "@/components/ui/use-toast";
-import Spinner from "../spinner";
-import { Badge } from "../ui/badge";
-import Avatar from "./avatar";
+} from '@/components/ui/dropdown-menu';
+import { useToast } from '@/components/ui/use-toast';
+import Spinner from '../spinner';
+import { Badge } from '../ui/badge';
+import Avatar from './avatar';
 
 function HeaderDropdown() {
   const { authUser, userDetails } = useAuth();
@@ -24,7 +24,7 @@ function HeaderDropdown() {
     mutationFn: () => logout(),
     onError: (error: any) =>
       toast({
-        variant: "destructive",
+        variant: 'destructive',
         title: handleLogoutError(error.code),
       }),
   });
@@ -32,13 +32,7 @@ function HeaderDropdown() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
-        <Avatar
-          name={
-            authUser?.displayName ||
-            `${userDetails?.first_name} ${userDetails?.last_name}` ||
-            ""
-          }
-        />
+        <Avatar name={authUser?.displayName || `${userDetails?.first_name} ${userDetails?.last_name}` || ''} />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-52">
         <DropdownMenuLabel className="flex flex-col items-start gap-2">
@@ -63,9 +57,7 @@ function HeaderDropdown() {
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => logoutMutation.mutate()}>
-          {logoutMutation.isPending && (
-            <Spinner className="mr-1 h-5 w-5 text-white" />
-          )}
+          {logoutMutation.isPending && <Spinner className="mr-1 h-5 w-5 text-white" />}
           Logout
         </DropdownMenuItem>
       </DropdownMenuContent>

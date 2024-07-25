@@ -1,5 +1,5 @@
-import { type PropsWithChildren } from "react";
-import { Metadata } from "next";
+import { type PropsWithChildren } from 'react';
+import { Metadata } from 'next';
 
 /**
  * The Layout is needed to specify the page title and meta tags.
@@ -9,6 +9,6 @@ export default function UserLayout({ children }: PropsWithChildren) {
 }
 
 export const metadata: Metadata = {
-  title: "User Details",
-  robots: "noindex",
+  title: 'User Details',
+  robots: 'noindex',
 };

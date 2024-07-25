@@ -1,45 +1,28 @@
-"use client";
+'use client';
 
-import { updateUser } from "@/firebase/client/mutations/users";
-import { type UpdateUserPayloadType } from "@/firebase/client/mutations/users/types";
-import useAuth from "@/hooks/useAuth";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { type DialogProps } from "@radix-ui/react-dialog";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
-import { useForm, type SubmitHandler } from "react-hook-form";
-import { z } from "zod";
+import { updateUser } from '@/firebase/client/mutations/users';
+import { type UpdateUserPayloadType } from '@/firebase/client/mutations/users/types';
+import useAuth from '@/hooks/useAuth';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { type DialogProps } from '@radix-ui/react-dialog';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { format } from 'date-fns';
+import { CalendarIcon } from 'lucide-react';
+import { useForm, type SubmitHandler } from 'react-hook-form';
+import { z } from 'zod';
 
-import { cn } from "@/lib/utils";
-import Spinner from "@/components/spinner";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  Form,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { useToast } from "@/components/ui/use-toast";
+import { cn } from '@/lib/utils';
+import Spinner from '@/components/spinner';
+import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
+import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Form, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { useToast } from '@/components/ui/use-toast';
 
 const FormSchema = z.object({
   dob: z.date({
-    required_error: "A date of birth is required.",
+    required_error: 'A date of birth is required.',
   }),
 });
 
@@ -50,9 +33,7 @@ function UpdateDateOfBirthModal(props: UpdateDateOfBirthModalProps) {
   const { authUser, userDetails } = useAuth();
 
   const defaultValues: FormValues = {
-    dob: Number(userDetails?.dob)
-      ? new Date(Number(userDetails?.dob))
-      : new Date(),
+    dob: Number(userDetails?.dob) ? new Date(Number(userDetails?.dob)) : new Date(),
   };
 
   const form = useForm<FormValues>({
@@ -64,7 +45,7 @@ function UpdateDateOfBirthModal(props: UpdateDateOfBirthModalProps) {
     mutationFn: (request: UpdateUserPayloadType) => updateUser(request),
     onSuccess: () => {
       toast({
-        variant: "success",
+        variant: 'success',
         title: "User's date of birth updated successfully",
       });
       form.reset(form.watch(), {
@@ -72,12 +53,12 @@ function UpdateDateOfBirthModal(props: UpdateDateOfBirthModalProps) {
         keepDirty: false,
         keepDefaultValues: false,
       });
-      queryClient.invalidateQueries({ queryKey: ["User"] });
+      queryClient.invalidateQueries({ queryKey: ['User'] });
       closeModal();
     },
     onError: (error: any) =>
       toast({
-        variant: "destructive",
+        variant: 'destructive',
         title: `Error updating user's date of birth: ${error}`,
       }),
   });
@@ -106,10 +87,7 @@ function UpdateDateOfBirthModal(props: UpdateDateOfBirthModalProps) {
           <DialogTitle className="mb-2">Update date of birth</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form
-            className="space-y-6"
-            onSubmit={form.handleSubmit(onPressSubmit)}
-          >
+          <form className="space-y-6" onSubmit={form.handleSubmit(onPressSubmit)}>
             <FormField
               control={form.control}
               name="dob"
@@ -120,16 +98,9 @@ function UpdateDateOfBirthModal(props: UpdateDateOfBirthModalProps) {
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
-                        className={cn(
-                          "w-full pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground"
-                        )}
+                        className={cn('w-full pl-3 text-left font-normal', !field.value && 'text-muted-foreground')}
                       >
-                        {field.value ? (
-                          format(field.value, "PPP")
-                        ) : (
-                          <span>Pick a date</span>
-                        )}
+                        {field.value ? format(field.value, 'PPP') : <span>Pick a date</span>}
                         <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                       </Button>
                     </PopoverTrigger>
@@ -138,9 +109,7 @@ function UpdateDateOfBirthModal(props: UpdateDateOfBirthModalProps) {
                         mode="single"
                         selected={field.value}
                         onSelect={field.onChange}
-                        disabled={(date) =>
-                          date > new Date() || date < new Date("1900-01-01")
-                        }
+                        disabled={(date) => date > new Date() || date < new Date('1900-01-01')}
                         initialFocus
                       />
                     </PopoverContent>
@@ -151,24 +120,16 @@ function UpdateDateOfBirthModal(props: UpdateDateOfBirthModalProps) {
             />
             <DialogFooter>
               <DialogClose asChild>
-                <Button
-                  className="rounded-full"
-                  type="button"
-                  variant="secondary"
-                >
+                <Button className="rounded-full" type="button" variant="secondary">
                   Close
                 </Button>
               </DialogClose>
               <Button
                 className="rounded-full"
                 type="submit"
-                disabled={
-                  updateDateOfBirthMutation.isPending || !form.formState.isDirty
-                }
+                disabled={updateDateOfBirthMutation.isPending || !form.formState.isDirty}
               >
-                {updateDateOfBirthMutation.isPending && (
-                  <Spinner className="h-5 w-5 text-white" />
-                )}
+                {updateDateOfBirthMutation.isPending && <Spinner className="h-5 w-5 text-white" />}
                 Update
               </Button>
             </DialogFooter>

@@ -1,8 +1,8 @@
-import { AiOutlineMenu } from "react-icons/ai";
-import Link from "next/link";
-import Logo from "@/assets/logo.svg";
-import Image from "next/image";
-import HeaderDropdown from "./header-dropdown";
+import { AiOutlineMenu } from 'react-icons/ai';
+import Link from 'next/link';
+import Logo from '@/assets/logo.svg';
+import Image from 'next/image';
+import HeaderDropdown from './header-dropdown';
 
 function Header(props: HeaderProps) {
   return (

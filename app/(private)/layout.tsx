@@ -1,10 +1,10 @@
-import { type PropsWithChildren } from "react";
-import { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { type PropsWithChildren } from 'react';
+import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 
-import { getCompanies } from "@/firebase/client/queries/companies";
+import { getCompanies } from '@/firebase/client/queries/companies';
 
-import { PrivateProvider } from "./_context/private-provider";
+import { PrivateProvider } from './_context/private-provider';
 
 /**
  * The Layout is needed to specify the page title and meta tags.
@@ -20,6 +20,6 @@ export default async function PrivateLayout(props: PropsWithChildren) {
 }
 
 export const metadata: Metadata = {
-  title: "User Details",
-  robots: "noindex",
+  title: 'User Details',
+  robots: 'noindex',
 };

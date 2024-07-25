@@ -1,6 +1,6 @@
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { cn } from '@/lib/utils';
 
 function SubMenu(props: SubMenuProps) {
   const pathname = usePathname();
@@ -9,12 +9,12 @@ function SubMenu(props: SubMenuProps) {
       {props.items.map((item, index) => (
         <li key={index}>
           <Link
-            href={item.to ?? "#"}
+            href={item.to ?? '#'}
             className={cn(
-              "group relative flex items-center justify-between rounded-sm px-4 py-2 duration-300 ease-in-out hover:bg-slate-100",
+              'group relative flex items-center justify-between rounded-sm px-4 py-2 duration-300 ease-in-out hover:bg-slate-100',
               {
-                "bg-slate-100 font-medium": pathname === item.to,
-              }
+                'bg-slate-100 font-medium': pathname === item.to,
+              },
             )}
           >
             {item.label}

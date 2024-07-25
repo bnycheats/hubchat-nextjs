@@ -1,11 +1,11 @@
-import UpdateUserForm from "./_components/update-user-form";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { AiOutlineEye } from "react-icons/ai";
+import UpdateUserForm from './_components/update-user-form';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { AiOutlineEye } from 'react-icons/ai';
 
-import { getUser } from "@/firebase/client/queries/users";
-import { notFound } from "next/navigation";
-import { UserProvider } from "./_context/user-provider";
+import { getUser } from '@/firebase/client/queries/users';
+import { notFound } from 'next/navigation';
+import { UserProvider } from './_context/user-provider';
 
 export default async function UpdateUserPage({ params }: UpdateUserPageProps) {
   try {

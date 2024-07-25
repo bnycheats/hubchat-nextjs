@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useState } from 'react';
 
 function MenuItemGroup(props: MenuItemGroupProps) {
   const { children, active } = props;

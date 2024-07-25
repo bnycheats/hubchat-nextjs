@@ -1,18 +1,14 @@
-import { ReactNode } from "react";
-import { Metadata } from "next";
+import { ReactNode } from 'react';
+import { Metadata } from 'next';
 
 /**
  * The Layout is needed to specify the page title and meta tags.
  */
-export default function UserAccountsLayout({
-  children,
-}: {
-  children: ReactNode;
-}) {
+export default function UserAccountsLayout({ children }: { children: ReactNode }) {
   return <>{children}</>;
 }
 
 export const metadata: Metadata = {
-  title: "User Accounts",
-  robots: "noindex",
+  title: 'User Accounts',
+  robots: 'noindex',
 };

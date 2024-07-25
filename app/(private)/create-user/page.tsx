@@ -1,4 +1,4 @@
-import CreateUserForm from "./_components/create-user-form";
+import CreateUserForm from './_components/create-user-form';
 
 export default async function CreateUserPage() {
   return (

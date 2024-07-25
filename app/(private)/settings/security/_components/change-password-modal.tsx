@@ -1,50 +1,37 @@
-"use client";
+'use client';
 
-import { handleChangePasswordError } from "@/errors/change-password-error";
-import { changePassword } from "@/firebase/client/mutations/auth";
-import { type ChangePasswordPayloadType } from "@/firebase/client/mutations/auth/types";
-import useAuth from "@/hooks/useAuth";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { type DialogProps } from "@radix-ui/react-dialog";
-import { useMutation } from "@tanstack/react-query";
-import { useForm, type SubmitHandler } from "react-hook-form";
-import { z } from "zod";
+import { handleChangePasswordError } from '@/errors/change-password-error';
+import { changePassword } from '@/firebase/client/mutations/auth';
+import { type ChangePasswordPayloadType } from '@/firebase/client/mutations/auth/types';
+import useAuth from '@/hooks/useAuth';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { type DialogProps } from '@radix-ui/react-dialog';
+import { useMutation } from '@tanstack/react-query';
+import { useForm, type SubmitHandler } from 'react-hook-form';
+import { z } from 'zod';
 
-import Password from "@/components/password";
-import Spinner from "@/components/spinner";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  Form,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { useToast } from "@/components/ui/use-toast";
+import Password from '@/components/password';
+import Spinner from '@/components/spinner';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Form, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { useToast } from '@/components/ui/use-toast';
 
 const FormSchema = z
   .object({
     oldPassword: z.string().min(6, {
-      message: "Password must be at least 6 characters",
+      message: 'Password must be at least 6 characters',
     }),
     newPassword: z.string().min(6, {
-      message: "Password must be at least 6 characters",
+      message: 'Password must be at least 6 characters',
     }),
     confirmPassword: z.string().min(6, {
-      message: "Password must be at least 6 characters",
+      message: 'Password must be at least 6 characters',
     }),
   })
   .refine((data) => data.newPassword === data.confirmPassword, {
-    path: ["confirmPassword"],
-    message: "Passwords does not match",
+    path: ['confirmPassword'],
+    message: 'Passwords does not match',
   });
 
 function ChangePasswordModal(props: ChangePasswordModalProps) {
@@ -53,9 +40,9 @@ function ChangePasswordModal(props: ChangePasswordModalProps) {
   const { authUser } = useAuth();
 
   const defaultValues: FormValues = {
-    oldPassword: "",
-    newPassword: "",
-    confirmPassword: "",
+    oldPassword: '',
+    newPassword: '',
+    confirmPassword: '',
   };
 
   const form = useForm<FormValues>({
@@ -67,15 +54,15 @@ function ChangePasswordModal(props: ChangePasswordModalProps) {
     mutationFn: (request: ChangePasswordPayloadType) => changePassword(request),
     onSuccess: () => {
       toast({
-        variant: "success",
-        title: "Your password has been updated successfully.",
+        variant: 'success',
+        title: 'Your password has been updated successfully.',
       });
       form.reset();
       closeModal();
     },
     onError: (error: any) =>
       toast({
-        variant: "destructive",
+        variant: 'destructive',
         title: handleChangePasswordError(error.code),
       }),
   });
@@ -102,21 +89,14 @@ function ChangePasswordModal(props: ChangePasswordModalProps) {
           <DialogTitle className="mb-2">Change Password</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form
-            className="space-y-6"
-            onSubmit={form.handleSubmit(onPressSubmit)}
-          >
+          <form className="space-y-6" onSubmit={form.handleSubmit(onPressSubmit)}>
             <FormField
               control={form.control}
               name="oldPassword"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Old Password</FormLabel>
-                  <Password
-                    {...field}
-                    placeholder="Old password*"
-                    disabled={changePasswordMutation.isPending}
-                  />
+                  <Password {...field} placeholder="Old password*" disabled={changePasswordMutation.isPending} />
                   <FormMessage />
                 </FormItem>
               )}
@@ -127,11 +107,7 @@ function ChangePasswordModal(props: ChangePasswordModalProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>New Password</FormLabel>
-                  <Password
-                    {...field}
-                    placeholder="New password*"
-                    disabled={changePasswordMutation.isPending}
-                  />
+                  <Password {...field} placeholder="New password*" disabled={changePasswordMutation.isPending} />
                   <FormMessage />
                 </FormItem>
               )}
@@ -153,22 +129,12 @@ function ChangePasswordModal(props: ChangePasswordModalProps) {
             />
             <DialogFooter>
               <DialogClose asChild>
-                <Button
-                  className="rounded-full"
-                  type="button"
-                  variant="secondary"
-                >
+                <Button className="rounded-full" type="button" variant="secondary">
                   Close
                 </Button>
               </DialogClose>
-              <Button
-                className="rounded-full"
-                type="submit"
-                disabled={changePasswordMutation.isPending}
-              >
-                {changePasswordMutation.isPending && (
-                  <Spinner className="h-5 w-5 text-white" />
-                )}
+              <Button className="rounded-full" type="submit" disabled={changePasswordMutation.isPending}>
+                {changePasswordMutation.isPending && <Spinner className="h-5 w-5 text-white" />}
                 Change Password
               </Button>
             </DialogFooter>

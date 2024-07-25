@@ -1,5 +1,5 @@
-import admin from "@/firebase/admin";
-import { NextRequest, NextResponse } from "next/server";
+import admin from '@/firebase/admin';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
   try {
@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
     });
     await admin
       .firestore()
-      .collection("Users")
+      .collection('Users')
       .doc(user.uid)
       .set({
         uid: user.uid,

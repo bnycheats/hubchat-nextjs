@@ -1,37 +1,24 @@
-"use client";
+'use client';
 
-import { updateUser } from "@/firebase/client/mutations/users";
-import { type UpdateUserPayloadType } from "@/firebase/client/mutations/users/types";
-import useAuth from "@/hooks/useAuth";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { type DialogProps } from "@radix-ui/react-dialog";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useForm, type SubmitHandler } from "react-hook-form";
-import { z } from "zod";
+import { updateUser } from '@/firebase/client/mutations/users';
+import { type UpdateUserPayloadType } from '@/firebase/client/mutations/users/types';
+import useAuth from '@/hooks/useAuth';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { type DialogProps } from '@radix-ui/react-dialog';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useForm, type SubmitHandler } from 'react-hook-form';
+import { z } from 'zod';
 
-import Spinner from "@/components/spinner";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  Form,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { useToast } from "@/components/ui/use-toast";
+import Spinner from '@/components/spinner';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Form, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { useToast } from '@/components/ui/use-toast';
 
 const FormSchema = z.object({
-  first_name: z.string().min(1, { message: "This field is required" }),
-  last_name: z.string().min(1, { message: "This field is required" }),
+  first_name: z.string().min(1, { message: 'This field is required' }),
+  last_name: z.string().min(1, { message: 'This field is required' }),
 });
 
 function UpdateFullNameModal(props: UpdateFullNameModalProps) {
@@ -41,8 +28,8 @@ function UpdateFullNameModal(props: UpdateFullNameModalProps) {
   const { authUser, userDetails } = useAuth();
 
   const defaultValues: FormValues = {
-    first_name: userDetails?.first_name ?? "",
-    last_name: userDetails?.last_name ?? "",
+    first_name: userDetails?.first_name ?? '',
+    last_name: userDetails?.last_name ?? '',
   };
 
   const form = useForm<FormValues>({
@@ -54,7 +41,7 @@ function UpdateFullNameModal(props: UpdateFullNameModalProps) {
     mutationFn: (request: UpdateUserPayloadType) => updateUser(request),
     onSuccess: () => {
       toast({
-        variant: "success",
+        variant: 'success',
         title: "User's full name updated successfully",
       });
       form.reset(form.watch(), {
@@ -62,12 +49,12 @@ function UpdateFullNameModal(props: UpdateFullNameModalProps) {
         keepDirty: false,
         keepDefaultValues: false,
       });
-      queryClient.invalidateQueries({ queryKey: ["User"] });
+      queryClient.invalidateQueries({ queryKey: ['User'] });
       closeModal();
     },
     onError: (error: any) =>
       toast({
-        variant: "destructive",
+        variant: 'destructive',
         title: `Error updating user's full name: ${error}`,
       }),
   });
@@ -94,21 +81,14 @@ function UpdateFullNameModal(props: UpdateFullNameModalProps) {
           <DialogTitle className="mb-2">Update full name</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form
-            className="space-y-6"
-            onSubmit={form.handleSubmit(onPressSubmit)}
-          >
+          <form className="space-y-6" onSubmit={form.handleSubmit(onPressSubmit)}>
             <FormField
               control={form.control}
               name="first_name"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>First name</FormLabel>
-                  <Input
-                    {...field}
-                    placeholder="First name*"
-                    disabled={updateFullNameMutation.isPending}
-                  />
+                  <Input {...field} placeholder="First name*" disabled={updateFullNameMutation.isPending} />
                   <FormMessage />
                 </FormItem>
               )}
@@ -119,35 +99,23 @@ function UpdateFullNameModal(props: UpdateFullNameModalProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Last name</FormLabel>
-                  <Input
-                    {...field}
-                    placeholder="Last name*"
-                    disabled={updateFullNameMutation.isPending}
-                  />
+                  <Input {...field} placeholder="Last name*" disabled={updateFullNameMutation.isPending} />
                   <FormMessage />
                 </FormItem>
               )}
             />
             <DialogFooter>
               <DialogClose asChild>
-                <Button
-                  className="rounded-full"
-                  type="button"
-                  variant="secondary"
-                >
+                <Button className="rounded-full" type="button" variant="secondary">
                   Close
                 </Button>
               </DialogClose>
               <Button
                 className="rounded-full"
                 type="submit"
-                disabled={
-                  updateFullNameMutation.isPending || !form.formState.isDirty
-                }
+                disabled={updateFullNameMutation.isPending || !form.formState.isDirty}
               >
-                {updateFullNameMutation.isPending && (
-                  <Spinner className="h-5 w-5 text-white" />
-                )}
+                {updateFullNameMutation.isPending && <Spinner className="h-5 w-5 text-white" />}
                 Update
               </Button>
             </DialogFooter>

@@ -1,4 +1,4 @@
-import CreateAccountForm from "./_components/create-account-form";
+import CreateAccountForm from './_components/create-account-form';
 
 export default function CreateAccountPage() {
   return (

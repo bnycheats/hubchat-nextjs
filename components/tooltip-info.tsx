@@ -1,10 +1,5 @@
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { AiOutlineInfoCircle } from "react-icons/ai";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { AiOutlineInfoCircle } from 'react-icons/ai';
 
 function TooltipInfo(props: TooltipInfoProps) {
   return (

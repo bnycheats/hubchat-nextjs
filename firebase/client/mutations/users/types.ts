@@ -1,4 +1,4 @@
-import { RolesEnums } from "@/helpers/types";
+import { RolesEnums } from '@/helpers/types';
 
 export type UpdateUserPayloadType = {
   userId: string;

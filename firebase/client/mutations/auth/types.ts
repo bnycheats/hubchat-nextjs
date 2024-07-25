@@ -1,5 +1,5 @@
-import { type User } from "firebase/auth";
-import { RolesEnums } from "@/helpers/types";
+import { type User } from 'firebase/auth';
+import { RolesEnums } from '@/helpers/types';
 
 export type LoginPayloadType = {
   email: string;

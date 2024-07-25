@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { AiOutlinePlus } from "react-icons/ai";
+import { AiOutlinePlus } from 'react-icons/ai';
 
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 export default function UsersPage() {
   return (

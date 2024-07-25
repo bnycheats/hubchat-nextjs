@@ -1,5 +1,5 @@
-import { type PropsWithChildren } from "react";
-import { Metadata } from "next";
+import { type PropsWithChildren } from 'react';
+import { Metadata } from 'next';
 /**
  * The Layout is needed to specify the page title and meta tags.
  */
@@ -11,6 +11,6 @@ export default function CreateAccountLayout(props: CreateAccountLayoutProps) {
 type CreateAccountLayoutProps = PropsWithChildren;
 
 export const metadata: Metadata = {
-  title: "Create Account",
-  robots: "noindex",
+  title: 'Create Account',
+  robots: 'noindex',
 };

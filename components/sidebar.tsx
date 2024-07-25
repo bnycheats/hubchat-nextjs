@@ -1,10 +1,10 @@
-import { useRef } from "react";
-import { AiOutlineArrowLeft } from "react-icons/ai";
-import Link from "next/link";
-import { cn } from "@/lib/utils";
-import Logo from "@/assets/logo.svg";
-import Image from "next/image";
-import Menu, { type MenuModelType } from "./menu";
+import { useRef } from 'react';
+import { AiOutlineArrowLeft } from 'react-icons/ai';
+import Link from 'next/link';
+import { cn } from '@/lib/utils';
+import Logo from '@/assets/logo.svg';
+import Image from 'next/image';
+import Menu, { type MenuModelType } from './menu';
 
 function Sidebar(props: SidebarProps) {
   const sidebar = useRef<any>(null);
@@ -14,11 +14,11 @@ function Sidebar(props: SidebarProps) {
     <aside
       ref={sidebar}
       className={cn(
-        "absolute top-0 z-50 flex h-screen w-56 flex-col overflow-y-hidden border-r bg-slate-50 duration-300 ease-linear lg:static lg:translate-x-0",
+        'absolute top-0 z-50 flex h-screen w-56 flex-col overflow-y-hidden border-r bg-slate-50 duration-300 ease-linear lg:static lg:translate-x-0',
         {
-          "left-0 translate-x-0": sidebarOpen,
-          "-translate-x-full": !sidebarOpen,
-        }
+          'left-0 translate-x-0': sidebarOpen,
+          '-translate-x-full': !sidebarOpen,
+        },
       )}
     >
       <div className="py-5.5 lg:py-6.5 flex items-center justify-between gap-2 px-6">

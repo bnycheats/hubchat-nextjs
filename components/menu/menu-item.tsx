@@ -1,18 +1,18 @@
-import { Fragment, useRef } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Transition } from "react-transition-group";
+import { Fragment, useRef } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { Transition } from 'react-transition-group';
 
-import { cn } from "@/lib/utils";
-import MenuItemGroup from "./menu-item-group";
-import SubMenu, { type SubMenuType } from "./sub-menu";
+import { cn } from '@/lib/utils';
+import MenuItemGroup from './menu-item-group';
+import SubMenu, { type SubMenuType } from './sub-menu';
 
 const transitionClasses = {
-  entering: "max-h-0 opacity-0",
-  entered: "max-h-230 opacity-100",
-  exiting: "max-h-0 opacity-0",
-  exited: "max-h-0 opacity-0",
-  unmounted: "",
+  entering: 'max-h-0 opacity-0',
+  entered: 'max-h-230 opacity-100',
+  exiting: 'max-h-0 opacity-0',
+  exited: 'max-h-0 opacity-0',
+  unmounted: '',
 };
 
 function MenuItem(props: MenuItemProps) {
@@ -24,11 +24,9 @@ function MenuItem(props: MenuItemProps) {
 
   if (hidden) return null;
 
-  if ("children" in props) {
+  if ('children' in props) {
     const isActive =
-      pathname === to ||
-      pathname.includes(itemKey) ||
-      !!children?.some((item) => pathname.includes(item?.to ?? ""));
+      pathname === to || pathname.includes(itemKey) || !!children?.some((item) => pathname.includes(item?.to ?? ''));
 
     return (
       <MenuItemGroup active={isActive}>
@@ -38,7 +36,7 @@ function MenuItem(props: MenuItemProps) {
               <Link
                 href="#"
                 className={cn(
-                  "group relative flex items-center justify-between rounded-sm px-4 py-2 duration-300 ease-in-out hover:bg-slate-100"
+                  'group relative flex items-center justify-between rounded-sm px-4 py-2 duration-300 ease-in-out hover:bg-slate-100',
                 )}
                 onClick={(e) => {
                   e.preventDefault();
@@ -50,8 +48,8 @@ function MenuItem(props: MenuItemProps) {
                   {label}
                 </div>
                 <svg
-                  className={cn("fill-current transition-all duration-200", {
-                    "rotate-180": open,
+                  className={cn('fill-current transition-all duration-200', {
+                    'rotate-180': open,
                   })}
                   width="20"
                   height="20"
@@ -82,8 +80,8 @@ function MenuItem(props: MenuItemProps) {
                     <div
                       ref={nodeRef}
                       className={cn(
-                        "translate transform overflow-hidden transition-all duration-200",
-                        transitionClasses[state]
+                        'translate transform overflow-hidden transition-all duration-200',
+                        transitionClasses[state],
                       )}
                     >
                       <SubMenu items={children} />
@@ -100,12 +98,12 @@ function MenuItem(props: MenuItemProps) {
 
   return (
     <Link
-      href={to ?? "#"}
+      href={to ?? '#'}
       className={cn(
-        "group relative flex items-center gap-2.5 rounded-sm px-4 py-2 duration-300 ease-in-out hover:bg-slate-100",
+        'group relative flex items-center gap-2.5 rounded-sm px-4 py-2 duration-300 ease-in-out hover:bg-slate-100',
         {
-          "bg-slate-100 font-medium": pathname?.includes(itemKey),
-        }
+          'bg-slate-100 font-medium': pathname?.includes(itemKey),
+        },
       )}
       onClick={(e) => {
         if (to === pathname) e.preventDefault();
