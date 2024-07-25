@@ -1,5 +1,3 @@
-import { type PropsWithChildren } from "react";
-
 import UpdateAccountForm from "./_components/update-account-form";
 import { notFound } from "next/navigation";
 import { getAccount } from "@/firebase/client/queries/accounts";
@@ -19,7 +17,7 @@ export default async function UserAccountPage(props: UserAccountProps) {
   }
 }
 
-type UserAccountProps = PropsWithChildren & {
+type UserAccountProps = {
   params: {
     accountId: string;
   };
