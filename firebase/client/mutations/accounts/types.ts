@@ -27,3 +27,7 @@ export type UpdateAccountPayloadType = {
     role: string;
   };
 };
+
+export type DisableAccountPayloadType = {
+  account_id: string;
+};

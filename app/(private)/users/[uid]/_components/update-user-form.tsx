@@ -25,6 +25,7 @@ import TooltipInfo from '@/components/tooltip-info';
 import { type UpdateUserPayloadType } from '@/firebase/client/mutations/users/types';
 import Spinner from '@/components/spinner';
 import useUser from '../_hooks/useUser';
+import Message from '@/components/message';
 
 const FormSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email address' }),
@@ -89,6 +90,12 @@ export default function UpdateUserForm() {
       },
     });
   };
+
+  if (!user?.active) {
+    return (
+      <Message title="User Disabled" message="User has been disabled. Please contact support for more information." />
+    );
+  }
 
   return (
     <Form {...form}>

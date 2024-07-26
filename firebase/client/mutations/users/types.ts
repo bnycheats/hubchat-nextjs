@@ -15,3 +15,7 @@ export type UpdateUserPayloadType = {
     companies: Array<string>;
   }>;
 };
+
+export type DisableUserPayloadType = {
+  userId: string;
+};

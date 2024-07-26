@@ -24,6 +24,7 @@ import { type GetAccountResponseType } from '@/firebase/client/queries/accounts/
 import convertToAmount from '@/utils/convertToAmount';
 import { getAccount } from '@/firebase/client/queries/accounts';
 import { useQuery } from '@tanstack/react-query';
+import Message from '@/components/message';
 
 const FormSchema = z.object({
   company_id: z.string().min(1, { message: 'This field is required' }),
@@ -112,6 +113,15 @@ export default function UpdateAccountForm(props: UpdateAccountFormProps) {
       });
     }
   }, [company]);
+
+  if (!account?.active) {
+    return (
+      <Message
+        title="Account Disabled"
+        message="Account has been disabled. Please contact support for more information."
+      />
+    );
+  }
 
   return (
     <div>

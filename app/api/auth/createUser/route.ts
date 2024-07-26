@@ -17,6 +17,7 @@ export async function POST(req: NextRequest) {
         uid: user.uid,
         email: user.email,
         created_at: admin.firestore.FieldValue.serverTimestamp(),
+        updated_at: admin.firestore.FieldValue.serverTimestamp(),
         active: true,
         ...other,
       });

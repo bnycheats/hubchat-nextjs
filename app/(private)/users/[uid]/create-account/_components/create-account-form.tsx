@@ -42,6 +42,8 @@ export default function CreateAccountForm() {
   const { companies } = useCompanies();
   const { user } = useUser();
 
+  console.log(user);
+
   const { toast } = useToast();
   const queryClient = useQueryClient();
 

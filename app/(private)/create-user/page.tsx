@@ -1,6 +1,6 @@
 import CreateUserForm from './_components/create-user-form';
 
-export default async function CreateUserPage() {
+export default function CreateUserPage() {
   return (
     <section>
       <h2 className="text-3xl">Create User</h2>

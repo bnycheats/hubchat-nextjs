@@ -14,6 +14,9 @@ export async function getUser({ userId }: GetUserPayloadType) {
     if (user.created_at) {
       user.created_at = (user.created_at as unknown as Timestamp).toMillis();
     }
+    if (user.updated_at) {
+      user.updated_at = (user.updated_at as unknown as Timestamp).toMillis();
+    }
     return user;
   } else {
     throw new Error('User not found!');
